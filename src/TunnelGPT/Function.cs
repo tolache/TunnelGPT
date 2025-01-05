@@ -1,5 +1,4 @@
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using Amazon.Lambda.Core;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -14,19 +13,12 @@ public class Function
     /// <summary>
     /// A simple function that queries Telegram API
     /// </summary>
-    /// <param name="input">A Telegram update object.</param>
+    /// <param name="update">A Telegram update object.</param>
     /// <param name="context">The ILambdaContext that provides methods for logging and describing the Lambda environment.</param>
     /// <returns></returns>
-    public string FunctionHandler(JsonObject? input, ILambdaContext context)
+    public string FunctionHandler(Update update, ILambdaContext context)
     {
-        string message;
-        if (input == null)
-        {
-            message = "Error! Received invalid payload: update is null";
-            LambdaLogger.Log(message);
-            return message;
-        }
-        message = $"Received update: {JsonSerializer.Serialize(input)}";
+        string message = $"Received update: {JsonSerializer.Serialize(update)}";
         LambdaLogger.Log(message);
         return message;
     }

@@ -41,9 +41,13 @@ public class FunctionTest
                                               }
                                           }
                                           """;
-        JsonObject? deserializedUpdateFromTelegram = JsonSerializer.Deserialize<JsonObject>(updateFromTelegram);
+        Update? deserializedUpdateFromTelegram = JsonSerializer.Deserialize<Update>(updateFromTelegram);
+        if (deserializedUpdateFromTelegram == null)
+        {
+            throw new InvalidOperationException("Failed to deserialize update from Telegram.");
+        }
         TestLambdaContext context = new();
-        Regex pattern = new(@"^Received update: .*");
+        Regex pattern = new("^Received update: {\"update_id\":1234567890,.+}");
 
         // Act
         string result = function.FunctionHandler(deserializedUpdateFromTelegram, context);
