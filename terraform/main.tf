@@ -32,5 +32,5 @@ module "api_gateway" {
 }
 
 output "lambda_invoke_url" {
-  value = module.api_gateway[0].api_gateway_invoke_url
+  value = var.lambda_is_deployed ? module.api_gateway[0].api_gateway_invoke_url : null
 }
