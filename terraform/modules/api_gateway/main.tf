@@ -1,18 +1,13 @@
 ﻿data "aws_lambda_function" "lambda" {
-  function_name = "TunnelGPT"
-}
-
-output "api_gateway_invoke_url" {
-  value = aws_api_gateway_stage.prod.invoke_url
-  description = "The URL to invoke the API Gateway"
+  function_name = var.lambda_function_name
 }
 
 resource "aws_api_gateway_rest_api" "api" {
-  name        = "TunnelGPT"
-  description = "API Gateway for TunnelGPT Lambda function. Created using Terraform."
+  name        = var.lambda_function_name
+  description = "API Gateway for ${var.lambda_function_name} Lambda function. Created using Terraform."
   
   tags = {
-    Application = "TunnelGPT"
+    Application = var.lambda_function_name
     Terraform   = "true"
   }
 }
@@ -65,17 +60,17 @@ resource "aws_api_gateway_deployment" "api_deployment" {
   ]
 
   rest_api_id = aws_api_gateway_rest_api.api.id
-  description = "API Gateway Deployment for TunnelGPT Lambda function. Created using Terraform."
+  description = "API Gateway Deployment for ${var.lambda_function_name} Lambda function. Created using Terraform."
 }
 
 resource "aws_api_gateway_stage" "prod" {
   stage_name    = "prod"
   deployment_id = aws_api_gateway_deployment.api_deployment.id
   rest_api_id   = aws_api_gateway_rest_api.api.id
-  description = "API Gateway Stage for TunnelGPT Lambda function. Created using Terraform."
+  description = "API Gateway Stage for ${var.lambda_function_name} Lambda function. Created using Terraform."
   
   tags = {
-    Application = "TunnelGPT"
+    Application = var.lambda_function_name
     Terraform   = "true"
   }
 }
