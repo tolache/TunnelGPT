@@ -94,3 +94,20 @@ The deployment will create the following resources in your AWS account:
    $invoke_url = terraform -chdir=terraform output -raw lambda_invoke_url
    curl "https://api.telegram.org/bot$env:TELEGRAM_BOT_TOKEN/setWebHook?url=$invoke_url&secret_token=$env:TELEGRAM_BOT_SECRET"
    ```
+
+## Remove
+
+### Prerequisites
+
+See [deployment prerequisites](#prerequisites).
+
+### Removal Steps
+
+1. Remove IAM role and API Gateway.
+   ```shell
+   terraform -chdir=terraform destroy -var="lambda_is_deployed=true"
+   ```
+2. Remove Lambda.
+   ```shell
+   dotnet lambda delete-function --function-name TunnelGPT --profile lambda-deployer
+   ```
