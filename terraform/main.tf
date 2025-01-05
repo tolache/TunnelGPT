@@ -17,7 +17,6 @@ variable "lambda_is_deployed" {
   default     = false
 }
 
-
 provider "aws" {
   region  = var.region
 }
@@ -30,4 +29,8 @@ module "api_gateway" {
   count  = var.lambda_is_deployed ? 1 : 0
   
   source = "./modules/api_gateway"
+}
+
+output "lambda_invoke_url" {
+  value = module.api_gateway[0].api_gateway_invoke_url
 }

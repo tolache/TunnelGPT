@@ -14,5 +14,6 @@
   "function-timeout": 30,
   "function-handler": "TunnelGPT::TunnelGPT.Function::FunctionHandler",
   "function-name": "TunnelGPT",
+  "function-description": "Handles TunnelGPT Telegram bot requests by invoking the OpenAI API",
   "s3-prefix": "TunnelGPT"
 }

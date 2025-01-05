@@ -2,6 +2,11 @@
   function_name = "TunnelGPT"
 }
 
+output "api_gateway_invoke_url" {
+  value = aws_api_gateway_stage.prod.invoke_url
+  description = "The URL to invoke the API Gateway"
+}
+
 resource "aws_api_gateway_rest_api" "api" {
   name        = "TunnelGPT"
   description = "API Gateway for TunnelGPT Lambda function. Created using Terraform."
