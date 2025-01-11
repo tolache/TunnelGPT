@@ -7,11 +7,7 @@ terraform {
   }
 }
 
-provider "aws" {
-  region  = data.aws_region.current.name
-}
-
-data "aws_region" "current" {}
+provider "aws" {}
 
 module "iam_role" {
   source = "./modules/iam_role"
