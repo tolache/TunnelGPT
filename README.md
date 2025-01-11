@@ -67,8 +67,8 @@ The deployment will create the following resources in your AWS account (in the `
    FUNCTION_ROLE=$(terraform -chdir=terraform output -raw lambda_role_name)    
    dotnet lambda deploy-function \
        --project-location src/TunnelGPT \
-       --function-role FUNCTION_ROLE \
-       --environment-variables "OPENAI_API_KEY=$env:OPENAI_API_KEY;TELEGRAM_BOT_TOKEN=$env:TELEGRAM_BOT_TOKEN"
+       --function-role $FUNCTION_ROLE \
+       --environment-variables "OPENAI_API_KEY=$OPENAI_API_KEY;TELEGRAM_BOT_TOKEN=$TELEGRAM_BOT_TOKEN"
    ```
 4. Deploy API Gateway and WAF.
    ```shell
