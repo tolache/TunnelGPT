@@ -15,7 +15,7 @@ dotnet test test/TunnelGPT.Tests
 
 ### Resources Created
 
-The deployment will create the following resources in your AWS account (in the `eu-west-1` region, by default):
+The deployment will create the following resources in your AWS account:
 
 1. IAM role for running the Lambda function.
 2. Lambda function that runs the main bot logic.
@@ -36,12 +36,20 @@ The deployment will create the following resources in your AWS account (in the `
      - `AWSLambda_FullAccess`
      - `AWSWAFFullAccess`
      - `IAMFullAccess`
-3. AWS profile for the Lambda deployer user is configured in `~/.aws/credentials`:
-   ```ini
-   [lambda-deployer]
-   aws_access_key_id = <your-access-key-id>
-   aws_secret_access_key = <your-secret-access-key>
-   ```
+3. Current AWS profile set to the Lambda deployer user with a set region. Example:
+   1. `~/.aws/credentials`:
+      ```ini
+      [lambda-deployer]
+      aws_access_key_id = <your-access-key-id>
+      aws_secret_access_key = <your-secret-access-key>
+      ```
+   2. `~/.aws/config`:
+      ```ini
+      [profile lambda-deployer]
+      region = eu-west-1
+      output = json
+      ```
+   3. `AWS_PROFILE` set to `lambda-deployer`
 4. Environment variables:
    - `AWS_PROFILE` set to the Lambda deployer user profile (e.g., `lambda-profile`).
    - `OPENAI_API_KEY` set to a valid OpenAI API token. [Where do I find my OpenAI API Key?](https://help.openai.com/articles/4936850-where-do-i-find-my-openai-api-key)

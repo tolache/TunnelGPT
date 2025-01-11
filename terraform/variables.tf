@@ -1,7 +1,3 @@
-variable "aws_region" {
-  default = "eu-west-1"
-}
-
 variable "application_name" {
   default = "TunnelGPT"
   description = "Name of the application. Should be the same as that of the Lambda function deployed by `dotnet lambda deploy-function` as it will be used for retrieving the Lambda function properties. It will also be used as the name of resources like IAM role used by Lambda, and API Gateway."

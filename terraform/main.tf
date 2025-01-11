@@ -8,8 +8,10 @@ terraform {
 }
 
 provider "aws" {
-  region  = var.aws_region
+  region  = data.aws_region.current.name
 }
+
+data "aws_region" "current" {}
 
 module "iam_role" {
   source = "./modules/iam_role"
