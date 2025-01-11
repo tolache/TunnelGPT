@@ -95,7 +95,7 @@ The deployment will create the following resources in your AWS account (in the `
    ```
 3. Deploy Lambda function.
    ```powershell
-   $function_role = terraform -chdir=terraform output -raw lambda_role_name    
+   $function_role = terraform -chdir=terraform output -raw lambda_role_name
    dotnet lambda deploy-function `
        --project-location src/TunnelGPT `
        --function-role $function_role `
@@ -121,11 +121,24 @@ See [deployment prerequisites](#prerequisites).
 
 ### Removal Steps
 
+#### Linux/macOS
+
 1. Remove IAM role and API Gateway.
    ```shell
-   terraform -chdir=terraform destroy -var="lambda_is_deployed=true"
+   terraform -chdir=terraform destroy -var="lambda_is_deployed=true" -var="telegram_bot_secret=$TELEGRAM_BOT_SECRET"
    ```
 2. Remove Lambda.
    ```shell
-   dotnet lambda delete-function --function-name TunnelGPT
+   dotnet lambda delete-function --project-location src/TunnelGPT
+   ```
+
+#### Windows
+
+1. Remove IAM role and API Gateway.
+   ```powershell
+   terraform -chdir=terraform destroy -var="lambda_is_deployed=true" -var="telegram_bot_secret=$env:TELEGRAM_BOT_SECRET"
+   ```
+2. Remove Lambda.
+   ```powershell
+   dotnet lambda delete-function --project-location src/TunnelGPT
    ```
