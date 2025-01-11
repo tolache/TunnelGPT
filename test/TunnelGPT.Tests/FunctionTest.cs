@@ -1,11 +1,8 @@
 using System.Text.RegularExpressions;
-using Xunit;
-using Amazon.Lambda.Core;
 using Amazon.Lambda.TestUtilities;
-using System.Text.Json;
-using System.Text.Json.Nodes;
 using Telegram.Bot.Types;
-using Xunit.Abstractions;
+using Telegram.Bot.Types.Enums;
+using Xunit;
 
 namespace TunnelGPT.Tests;
 
@@ -16,43 +13,39 @@ public class FunctionTest
     {
         // Arrange
         Function function = new();
-        const string updateFromTelegram = """
-                                          {
-                                              "update_id": 1234567890,
-                                              "message": {
-                                                  "message_id": 123,
-                                                  "from": {
-                                                      "id": 9876543210,
-                                                      "is_bot": false,
-                                                      "first_name": "John",
-                                                      "last_name": "Doe",
-                                                      "username": "johndoe",
-                                                      "language_code": "en"
-                                                  },
-                                                  "chat": {
-                                                      "id": 9876543210,
-                                                      "first_name": "John",
-                                                      "last_name": "Doe",
-                                                      "username": "johndoe",
-                                                      "type": "private"
-                                                  },
-                                                  "date": 1735736394,
-                                                  "text": "2025-01-01 13:59"
-                                              }
-                                          }
-                                          """;
-        Update? deserializedUpdateFromTelegram = JsonSerializer.Deserialize<Update>(updateFromTelegram);
-        if (deserializedUpdateFromTelegram == null)
+        Update update = new()
         {
-            throw new InvalidOperationException("Failed to deserialize update from Telegram.");
-        }
+            Id = 101,
+            Message = new Message
+            {
+                Id = 201,
+                Date = new DateTime(2025, 1, 1),
+                Text = "Hello, bot!",
+                From = new User
+                {
+                    Id = 301,
+                    FirstName = "John",
+                    LastName = "Doe",
+                    Username = "johndoe",
+                    IsBot = false,
+                    LanguageCode = "en",
+                },
+                Chat = new Chat
+                {
+                    Id = 401,
+                    FirstName = "John",
+                    LastName = "Doe",
+                    Username = "johndoe",
+                    Type = ChatType.Private,
+                },
+            }
+        };
         TestLambdaContext context = new();
-        Regex pattern = new("^Received update: {\"update_id\":1234567890,.+}");
 
         // Act
-        string result = function.FunctionHandler(deserializedUpdateFromTelegram, context);
+        Function.Response result = function.FunctionHandler(update, context);
 
         // Assert
-        Assert.Matches(pattern, result);
+        Assert.Matches(result.Status, "Success");
     }
 }

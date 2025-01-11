@@ -1,7 +1,6 @@
-using System.Text.Json;
 using Amazon.Lambda.Core;
-using Telegram.Bot;
 using Telegram.Bot.Types;
+using TunnelGPT.Utils;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
@@ -10,27 +9,26 @@ namespace TunnelGPT;
 
 public class Function
 {
+    private readonly IUpdateProcessor _updateProcessor;
+
+    public Function() : this(AppCompositionRoot.CreateUpdateProcessor()) {}
+
+    private Function(IUpdateProcessor updateProcessor)
+    {
+        _updateProcessor = updateProcessor;
+    }
+    
     /// <summary>
     /// A simple function that queries Telegram API
     /// </summary>
     /// <param name="update">A Telegram update object.</param>
     /// <param name="context">The ILambdaContext that provides methods for logging and describing the Lambda environment.</param>
     /// <returns></returns>
-    public string FunctionHandler(Update update, ILambdaContext context)
+    public Response FunctionHandler(Update update, ILambdaContext context)
     {
-        string message = $"Received update: {JsonSerializer.Serialize(update)}";
-        LambdaLogger.Log(message);
-        return message;
+            _updateProcessor.ProcessUpdateAsync(update);
+            return new Response("Success", "Update processed");
     }
-
-    private static string GetBotToken()
-    {
-        const string telegramBotTokenEnvVar = "TELEGRAM_BOT_TOKEN";
-        string? botToken = Environment.GetEnvironmentVariable(telegramBotTokenEnvVar);
-        if (string.IsNullOrEmpty(botToken))
-        {
-            throw new InvalidOperationException($"Environment variable {telegramBotTokenEnvVar} is not set.");
-        }
-        return botToken;
-    }
+    
+    public record Response(string Status, string Message);
 }
