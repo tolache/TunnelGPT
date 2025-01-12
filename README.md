@@ -68,7 +68,7 @@ The deployment will create the following resources in your AWS account:
 2. Create IAM role.
    ```shell
    terraform -chdir=terraform apply \
-       -var="telegram_bot_secret=$TELEGRAM_BOT_SECRET"
+       -var "telegram_bot_secret=$TELEGRAM_BOT_SECRET"
    ```
 3. Deploy Lambda function.
    ```shell
@@ -99,7 +99,7 @@ The deployment will create the following resources in your AWS account:
 2. Create IAM role.
    ```powershell
    terraform -chdir=terraform apply `
-       -var="telegram_bot_secret=$env:TELEGRAM_BOT_SECRET"
+       -var "telegram_bot_secret=$env:TELEGRAM_BOT_SECRET"
    ```
 3. Deploy Lambda function.
    ```powershell
@@ -133,7 +133,7 @@ See [deployment prerequisites](#prerequisites).
 
 1. Remove IAM role and API Gateway.
    ```shell
-   terraform -chdir=terraform destroy -var="lambda_is_deployed=true" -var="telegram_bot_secret=$TELEGRAM_BOT_SECRET"
+   terraform -chdir=terraform destroy -var "lambda_is_deployed=true" -var "telegram_bot_secret=$TELEGRAM_BOT_SECRET"
    ```
 2. Remove Lambda.
    ```shell
@@ -144,7 +144,7 @@ See [deployment prerequisites](#prerequisites).
 
 1. Remove IAM role and API Gateway.
    ```powershell
-   terraform -chdir=terraform destroy -var="lambda_is_deployed=true" -var="telegram_bot_secret=$env:TELEGRAM_BOT_SECRET"
+   terraform -chdir=terraform destroy -var "lambda_is_deployed=true" -var "telegram_bot_secret=$env:TELEGRAM_BOT_SECRET"
    ```
 2. Remove Lambda.
    ```powershell
