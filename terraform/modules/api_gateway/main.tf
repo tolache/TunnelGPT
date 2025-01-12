@@ -1,8 +1,4 @@
-﻿data "aws_lambda_function" "lambda" {
-  function_name = var.lambda_function_name
-}
-
-resource "aws_api_gateway_rest_api" "api" {
+﻿resource "aws_api_gateway_rest_api" "api" {
   name        = var.lambda_function_name
   description = "API Gateway for ${var.lambda_function_name} Lambda function. Created using Terraform."
   
@@ -25,7 +21,7 @@ resource "aws_api_gateway_integration" "lambda" {
   http_method             = aws_api_gateway_method.any_method.http_method
   integration_http_method = "POST"
   type                    = "AWS"
-  uri                     = data.aws_lambda_function.lambda.invoke_arn
+  uri                     = var.lamda_invoke_arn
 
   passthrough_behavior = "WHEN_NO_MATCH"
   content_handling     = "CONVERT_TO_TEXT"
@@ -80,7 +76,7 @@ resource "aws_lambda_permission" "api_gateway" {
   
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
-  function_name = data.aws_lambda_function.lambda.function_name
+  function_name = var.lambda_function_name
   principal     = "apigateway.amazonaws.com"
   source_arn = "${aws_api_gateway_rest_api.api.execution_arn}/*/*"
 }
