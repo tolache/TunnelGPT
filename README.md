@@ -5,6 +5,8 @@
 
 This is a simple Telegram bot designed to bypass OpenAI's country restrictions by invoking OpenAI API through AWS Lambda.
 
+Distributed under [CC BY-NC](https://www.creativecommons.org/licenses/by-nc/4.0/) license.
+
 ## Run tests
 
 ```shell
