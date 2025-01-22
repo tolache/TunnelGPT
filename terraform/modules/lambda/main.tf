@@ -1,4 +1,4 @@
-resource "aws_lambda_function" "tunnel_gpt" {
+resource "aws_lambda_function" "tunnelgpt" {
   architectures                  = ["x86_64"]
   description                    = "Handles TunnelGPT Telegram bot requests by invoking the OpenAI API"
   function_name                  = var.function_name

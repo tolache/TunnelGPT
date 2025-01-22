@@ -1,4 +1,9 @@
-variable "lambda_function_name" {
+variable "application_name" {
   type = string
-  description = "The name of the TunnelGPT Lambda function. Used for extracting the existing Lambda function properties."
+  description = "Application name. Used as the IAM role name, in descriptions, and tags."
+}
+
+variable "dynamodb_table_arn" {
+  type = string
+  description = "DynamoDB table ARN"
 }

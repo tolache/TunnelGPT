@@ -32,9 +32,11 @@ The deployment will create the following resources in your AWS account:
    - AWS CLI (`aws --version`)
    - Terraform (`terraform --version`)
    - curl (`curl --version`)
-2. Existing Lambda deployer IAM user (e.g., `lambda-deployer`) with:
-   - Attached policies:
+2. Existing Lambda deployer IAM user (e.g., `lambda-deployer`) with enough permissions to create the 
+   [resources it needs to create](#resources-created). As an example, that can be achieved by attaching the following 
+   policies:
      - `AmazonAPIGatewayAdministrator`
+     - `AmazonDynamoDBFullAccess`
      - `AmazonS3FullAccess`
      - `AWSLambda_FullAccess`
      - `AWSWAFFullAccess`
@@ -116,7 +118,6 @@ The deployment will create the following resources in your AWS account:
    }
    EOF
    )
-   
    INVOKE_URL=$(terraform -chdir=terraform output -raw lambda_invoke_url)
    curl $INVOKE_URL \
    -X POST \

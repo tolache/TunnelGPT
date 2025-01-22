@@ -1,6 +1,6 @@
 variable "lambda_function_name" {
   type = string
-  description = "The name of the TunnelGPT Lambda function. Used for extracting the existing Lambda function properties."
+  description = "Lambda function name. Used for description and tags in API Gateway and related resources."
 }
 
 variable "lamda_invoke_arn" {

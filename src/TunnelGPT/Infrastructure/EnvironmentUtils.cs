@@ -1,4 +1,4 @@
-namespace TunnelGPT.Utils;
+namespace TunnelGPT.Infrastructure;
 
 public static class EnvironmentUtils
 {

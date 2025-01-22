@@ -1,5 +1,8 @@
-using System.Text.RegularExpressions;
+using Amazon.DynamoDBv2.DataModel;
 using Amazon.Lambda.TestUtilities;
+using Moq;
+using OpenAI.Chat;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Xunit;
@@ -9,10 +12,13 @@ namespace TunnelGPT.Tests;
 public class FunctionTest
 {
     [Fact]
-    public void FunctionHandler_Invoked_EchoesReceivedUpdate()
+    public async Task FunctionHandler_GivenValidUpdate_ReturnsSuccessfulResponse()
     {
         // Arrange
-        Function function = new();
+        Mock<IDynamoDBContext> mockDynamoDbContext = new();
+        Mock<ChatClient> mockOpenAiClient = new();
+        Mock<ITelegramBotClient> mockTelegramClient = new();
+        Function function = new(mockDynamoDbContext.Object, mockOpenAiClient.Object, mockTelegramClient.Object);
         Update update = new()
         {
             Id = 101,
@@ -43,9 +49,27 @@ public class FunctionTest
         TestLambdaContext context = new();
 
         // Act
-        Function.Response result = function.FunctionHandler(update, context);
+        Function.Response result = await function.FunctionHandler(update, context);
 
         // Assert
-        Assert.Matches(result.Status, "Success");
+        Assert.Equal("Success", result.Status);
+    }
+    
+    [Fact]
+    public async Task FunctionHandler_GivenInvalidUpdate_ReturnsErrorResponse()
+    {
+        // Arrange
+        Mock<IDynamoDBContext> mockDynamoDbContext = new();
+        Mock<ChatClient> mockOpenAiClient = new();
+        Mock<ITelegramBotClient> mockTelegramClient = new();
+        Function function = new(mockDynamoDbContext.Object, mockOpenAiClient.Object, mockTelegramClient.Object);
+        Update update = new();
+        TestLambdaContext context = new();
+        // Act
+        Function.Response response = await function.FunctionHandler(update, context);
+
+        // Assert
+        Assert.Equal("Error", response.Status);
+        Assert.Contains("Failed to process update", response.Message);
     }
 }

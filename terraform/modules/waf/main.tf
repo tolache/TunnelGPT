@@ -1,7 +1,7 @@
 resource "aws_wafv2_web_acl" "api_waf" {
   name        = var.application_name
   scope       = "REGIONAL"
-  description = "WAF for validating Telegram webhook requests. Created using Terraform."
+  description = "WAF for validating ${var.application_name} Telegram webhook requests. Created using Terraform."
 
   default_action {
     block {}

@@ -9,9 +9,17 @@ terraform {
 
 provider "aws" {}
 
+module "dynamodb" {
+  source = "./modules/dynamodb"
+  application_name = var.application_name
+}
+
 module "iam_role" {
+  depends_on = [module.dynamodb]
+  
   source = "./modules/iam_role"
-  lambda_function_name = var.application_name
+  application_name = var.application_name
+  dynamodb_table_arn = module.dynamodb.table_arn
 }
 
 module "lambda" {
