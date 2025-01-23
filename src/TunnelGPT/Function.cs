@@ -20,9 +20,9 @@ public class Function
 
     public Function()
     {
-        _dynamoDbContext = new DynamoDBContext(new AmazonDynamoDBClient());
-        _openAiClient = new ChatClient("gpt-4o", EnvironmentUtils.GetOpenAiApiKey());
-        _telegramClient = new TelegramBotClient(EnvironmentUtils.GetTelegramBotToken());
+        _dynamoDbContext = DependencyFactory.CreateDynamoDbContext();
+        _openAiClient = DependencyFactory.CreateOpenAiClient();
+        _telegramClient = DependencyFactory.CreateTelegramClient();
     }
 
     public Function(IDynamoDBContext dynamoDbContext, ChatClient openAiClient, ITelegramBotClient telegramClient)
@@ -42,8 +42,12 @@ public class Function
         ArgumentNullException.ThrowIfNull(update);
         
         ILambdaLogger logger = context.Logger;
-        UpdateProcessorDependencies dependencies = new(_dynamoDbContext, logger, _openAiClient, _telegramClient);
-        UpdateProcessor updateProcessor = new(dependencies);
+        UpdateProcessor updateProcessor = new(
+            dynamoDbContext: _dynamoDbContext,
+            logger: context.Logger,
+            openAiClient: _openAiClient,
+            telegramClient: _telegramClient
+            );
 
         try
         {
