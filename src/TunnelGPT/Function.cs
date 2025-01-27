@@ -1,4 +1,3 @@
-using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.Lambda.Core;
 using OpenAI.Chat;
@@ -32,11 +31,6 @@ public class Function
         _telegramClient = telegramClient;
     }
     
-    /// <summary>A simple function that queries Telegram and OpenAI APIs</summary>
-    /// <param name="update">A Telegram update object.</param>
-    /// <param name="context">The ILambdaContext providing methods for logging and describing the Lambda environment.</param>
-    /// <exception cref="ArgumentNullException"> <paramref name="update"/> is null.</exception>
-    /// <returns></returns>
     public async Task<Response> FunctionHandler(Update update, ILambdaContext context)
     {
         ArgumentNullException.ThrowIfNull(update);

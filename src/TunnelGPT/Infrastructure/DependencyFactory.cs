@@ -7,9 +7,20 @@ namespace TunnelGPT.Infrastructure;
 
 public static class DependencyFactory
 {
-    public static IDynamoDBContext CreateDynamoDbContext()
+    public static IAmazonDynamoDB CreateDynamoDbClient(string? serviceUrl = null)
     {
-        return new DynamoDBContext(new AmazonDynamoDBClient());
+        AmazonDynamoDBConfig config = new();
+        if (!string.IsNullOrEmpty(serviceUrl))
+        {
+            config.ServiceURL = serviceUrl;
+        }
+        return new AmazonDynamoDBClient(config);
+    }
+    
+    public static IDynamoDBContext CreateDynamoDbContext(IAmazonDynamoDB? dynamoDbClient = null)
+    {
+        dynamoDbClient ??= CreateDynamoDbClient();
+        return new DynamoDBContext(dynamoDbClient);
     }
 
     public static ChatClient CreateOpenAiClient()

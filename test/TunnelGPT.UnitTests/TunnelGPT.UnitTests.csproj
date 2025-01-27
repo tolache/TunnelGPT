@@ -17,4 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\TunnelGPT\TunnelGPT.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Using Include="Xunit"/>
+  </ItemGroup>
 </Project>
