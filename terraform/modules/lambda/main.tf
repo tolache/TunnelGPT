@@ -15,6 +15,7 @@ resource "aws_lambda_function" "tunnelgpt" {
   }
 
   filename = "../publish/TunnelGPT.zip"
+  source_code_hash = filebase64sha256("../publish/TunnelGPT.zip")
 
   environment {
     variables = {
