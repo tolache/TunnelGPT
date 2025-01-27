@@ -134,6 +134,7 @@ The deployment will create the following resources in your AWS account:
    -H "X-Telegram-Bot-Api-Secret-Token: $TELEGRAM_BOT_SECRET" \
    -d $data
    ```
+   It should return `{"Status":"Error","Message":"Failed to process update: Bad Request: chat not found"}`.
 
 #### Windows
 
