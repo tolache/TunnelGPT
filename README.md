@@ -10,7 +10,7 @@ Distributed under [CC BY-NC](https://www.creativecommons.org/licenses/by-nc/4.0/
 ## Run tests
 
 ```shell
-dotnet test test/TunnelGPT.Tests
+dotnet test
 ```
 
 ## Deploy
@@ -25,7 +25,7 @@ The deployment will create the following resources in your AWS account:
 4. API Gateway for invoking the Lambda function with a request from a Telegram webhook.
 5. Web Application Firewall for verifying the incoming requests are sent by the authorized Telegram webhook.
 
-### Prerequisites
+### Deployer Requirements
 
 1. Tools:
    - .NET 8 (`dotnet --list-sdks`)
@@ -42,7 +42,7 @@ The deployment will create the following resources in your AWS account:
      - `AWSWAFFullAccess`
      - `CloudWatchLogsFullAccess`
      - `IAMFullAccess`
-3. Current AWS profile set to the Lambda deployer user with a set region. Example config:
+3. A configured Lambda deployer AWS profile with valid credentials and a set region. Example config:
    1. `~/.aws/credentials`:
       ```ini
       [lambda-deployer]
@@ -189,9 +189,9 @@ The deployment will create the following resources in your AWS account:
 
 ## Remove
 
-### Prerequisites
+### Remover Requirements
 
-See [deployment prerequisites](#prerequisites).
+See [Deployer Requirements](#deployer-requirements).
 
 ### Removal Steps
 
