@@ -7,7 +7,16 @@ This is a simple Telegram bot designed to bypass OpenAI's country restrictions b
 
 Distributed under [CC BY-NC](https://www.creativecommons.org/licenses/by-nc/4.0/) license.
 
-## Run tests
+## Test
+
+### Tester Requirements
+
+Tools required on the machine running tests:
+
+1. .NET 8 or newer (`dotnet --list-sdks`)
+2. Docker (`docker --version`)
+
+### Run Tests
 
 ```shell
 dotnet test

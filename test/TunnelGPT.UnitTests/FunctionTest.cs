@@ -7,7 +7,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Xunit;
 
-namespace TunnelGPT.Tests;
+namespace TunnelGPT.UnitTests;
 
 public class FunctionTest
 {
