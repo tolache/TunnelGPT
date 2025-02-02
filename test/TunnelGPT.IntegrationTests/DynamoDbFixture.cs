@@ -34,12 +34,15 @@ public class DynamoDbFixture : IAsyncLifetime
             {
                 Image = imageName,
                 Name = containerName,
+                Cmd = new List<string> { "-jar", "DynamoDBLocal.jar", "-sharedDb", "-inMemory" },
                 HostConfig = new HostConfig
                 {
                     PortBindings = new Dictionary<string, IList<PortBinding>>
                     {
                         { "8000/tcp", new List<PortBinding> { new() { HostPort = "8000" } } }
-                    }
+                    },
+                    Memory = 128 * 1024 * 1024,
+                    NanoCPUs = 500_000_000
                 }
             });
         _containerId = (await response).ID;

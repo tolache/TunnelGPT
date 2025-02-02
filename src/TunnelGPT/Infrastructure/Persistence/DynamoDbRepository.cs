@@ -25,4 +25,25 @@ public class DynamoDbRepository(IDynamoDBContext dynamoDbContext, ILambdaLogger 
             throw;
         }
     }
+
+    public async Task<User?> GetUserByIdAsync(long userId)
+    {
+        try
+        {
+            User user = await dynamoDbContext.LoadAsync<User>(userId);
+            if (user is null)
+            {
+                logger.LogDebug($"User with id wasn't found in the database.");
+                return null;
+            }
+            logger.LogDebug($"Found user '{user.Username}' with id '{user.UserId}' in the database.");
+            return user;
+        }
+        catch (Exception e)
+        {
+            logger.LogError($"Failed to load user from the database. Reason: {e.Message}");
+            logger.LogDebug(e.StackTrace);
+            throw;
+        }
+    }
 }
