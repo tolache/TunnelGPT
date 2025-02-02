@@ -162,7 +162,7 @@ The deployment will create the following resources in your AWS account:
    $invoke_url = terraform -chdir=terraform output -raw lambda_invoke_url
    curl "https://api.telegram.org/bot$env:TELEGRAM_BOT_TOKEN/setWebHook?url=$invoke_url&secret_token=$env:TELEGRAM_BOT_SECRET"
    ```
-6. Verify AWS setup.
+6. Verify AWS setup. 
    ```powershell
    $data = @"
    {
@@ -196,6 +196,7 @@ The deployment will create the following resources in your AWS account:
        -H "X-Telegram-Bot-Api-Secret-Token: $env:TELEGRAM_BOT_SECRET" `
        -d $data
    ```
+   It should return `{"Status":"Error","Message":"Failed to process update: Bad Request: chat not found"}`.
 
 ## Remove
 
