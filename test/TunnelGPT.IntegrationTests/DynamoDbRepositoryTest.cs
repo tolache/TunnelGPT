@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.Model;
@@ -37,6 +38,7 @@ public class DynamoDbRepositoryTest : IClassFixture<DynamoDbFixture>
         // Act
         await _dynamoDbRepository.SaveUserAsync(userToWriteToDb.UserId, userToWriteToDb.Username);
         User? userExtractedFromDb = await _dynamoDbRepository.GetUserByIdAsync(userToWriteToDb.UserId);
+        await OutputTableContentAsync();
         
         // Assert
         Assert.Equal(userToWriteToDb, userExtractedFromDb);
@@ -51,6 +53,7 @@ public class DynamoDbRepositoryTest : IClassFixture<DynamoDbFixture>
         
         // Act
         User? userExtractedFromDb = await _dynamoDbRepository.GetUserByIdAsync(userToReadFromDb.UserId);
+        await OutputTableContentAsync();
         
         // Assert
         Assert.Null(userExtractedFromDb);
@@ -77,6 +80,43 @@ public class DynamoDbRepositoryTest : IClassFixture<DynamoDbFixture>
         else
         {
             _output.WriteLine($"Table '{tableName}' already exists.");
+        }
+    }
+    
+    private async Task OutputTableContentAsync()
+    {
+        const string tableName = "tunnelgpt";
+        try
+        {
+            ScanRequest scanRequest = new() { TableName = tableName };
+            ScanResponse scanResponse = await _dynamoDbClient.ScanAsync(scanRequest);
+            if (scanResponse.Items.Count == 0)
+            {
+                _output.WriteLine($"The table '{tableName}' is empty.");
+            }
+            else
+            {
+                _output.WriteLine($"Contents of the table '{tableName}':");
+                foreach (Dictionary<string, AttributeValue> item in scanResponse.Items)
+                {
+                    Dictionary<string, string?> itemData = item.ToDictionary(
+                        kvp => kvp.Key, 
+                        kvp => kvp.Value.S ?? kvp.Value.N ?? kvp.Value.ToString()
+                    );
+                    string itemJson = JsonSerializer.Serialize(
+                        itemData,
+                        new JsonSerializerOptions
+                        {
+                            WriteIndented = true,
+                        }
+                    );
+                    _output.WriteLine(itemJson);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            _output.WriteLine($"Failed to read the table '{tableName}'. Reason: {e.Message}");
         }
     }
 }
