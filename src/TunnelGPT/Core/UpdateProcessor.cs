@@ -20,9 +20,19 @@ public class UpdateProcessor(
     
     public async Task ProcessUpdateAsync(Update update)
     {
-        (long userId, string username, string messageText, ChatId chatId) = ValidateAndExtract(update);
+        MessageData messageData = ValidateAndExtract(update);
+        long userId = messageData.UserId;
+        string username = messageData.Username;
+        string messageText = messageData.MessageText;
+        ChatId chatId = messageData.ChatId;
+        
         logger.LogInformation($"Received a message from user '{username}' with id '{userId})'.");
         await _dynamoDbRepository.SaveUserAsync(userId, username);
+        if (messageText.Equals("/start", StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+        
         string reply;
         try
         {
