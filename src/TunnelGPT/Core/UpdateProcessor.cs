@@ -12,7 +12,7 @@ public class UpdateProcessor(
     IDynamoDBContext dynamoDbContext, 
     // Not ILogger until https://github.com/aws/aws-lambda-dotnet/issues/1747 is fixed
     ILambdaLogger logger,
-    ChatClient openAiClient, 
+    ChatClient openAiClient,
     ITelegramBotClient telegramClient
 )
 {
@@ -21,15 +21,26 @@ public class UpdateProcessor(
     public async Task ProcessUpdateAsync(Update update)
     {
         (long userId, string username, string messageText, ChatId chatId) = ValidateAndExtract(update);
-        string reply = $"You said: {messageText}";
-        
         logger.LogInformation($"Received a message from user '{username}' with id '{userId})'.");
         await _dynamoDbRepository.SaveUserAsync(userId, username);
+        string reply;
+        try
+        {
+            reply = await GenerateReplyAsync(messageText);
+        }
+        catch (Exception e)
+        {
+            logger.LogError($"Failed to generate a reply. Reason: {e.Message}");
+            logger.LogDebug(e.StackTrace);
+            reply = "Sorry, I couldn't generate a reply. Reason: " + Environment.NewLine +
+                    e.Message + Environment.NewLine +
+                    e.StackTrace;
+        }
         await telegramClient.SendMessage(chatId, reply);
         logger.LogInformation($"Sent a reply to user '{username}' with id '{userId})'.");
     }
     
-    private (long userId, string username, string messageText, ChatId chatId) ValidateAndExtract(Update update)
+    private MessageData ValidateAndExtract(Update update)
     {
         ArgumentNullException.ThrowIfNull(update);
         
@@ -59,6 +70,20 @@ public class UpdateProcessor(
         string messageText = update.Message.Text;
         ChatId chatId = update.Message.Chat.Id;
         
-        return (userId, username, messageText, chatId);
+        return new MessageData(userId, username, messageText, chatId);
     }
+
+    private async Task<string> GenerateReplyAsync(string messageText)
+    {
+        const string systemPrompt = "You are a helpful assistant. " +
+                                    "Always provide a short answer unless the user explicitly asks for a detailed one. " +
+                                    "Reply in the same language as the user's question.";
+        ChatCompletion completion = await openAiClient.CompleteChatAsync([
+            new SystemChatMessage(systemPrompt), 
+            new UserChatMessage(messageText)
+        ]);
+        return completion.Content.First()?.Text ?? "Sorry, I couldn't generate a reply. Reason: Empty response.";
+    }
+    
+    private record MessageData(long UserId, string Username, string MessageText, ChatId ChatId);
 }
