@@ -15,13 +15,11 @@ public class DynamoDbRepositoryTest : IClassFixture<DynamoDbFixture>
     private const string DynamoDbLocalUrl = "http://localhost:8000";
     private readonly IAmazonDynamoDB _dynamoDbClient;
     private readonly DynamoDbRepository _dynamoDbRepository;
-    private readonly DynamoDbFixture _fixture;
     private readonly ILambdaLogger _logger;
     private readonly ITestOutputHelper _output;
 
-    public DynamoDbRepositoryTest(DynamoDbFixture fixture, ITestOutputHelper output)
+    public DynamoDbRepositoryTest(ITestOutputHelper output)
     {
-        _fixture = fixture;
         _output = output;
         _logger = new TestLambdaContext().Logger;
         _dynamoDbClient = DependencyFactory.CreateDynamoDbClient(DynamoDbLocalUrl);

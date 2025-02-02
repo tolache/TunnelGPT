@@ -5,28 +5,30 @@ namespace TunnelGPT.IntegrationTests;
 
 public class DynamoDbFixture : IAsyncLifetime
 {
-    private readonly DockerClient _dockerClient;
+    private readonly DockerClient _dockerClient = new DockerClientConfiguration().CreateClient();
     private string? _containerId;
 
-    public DynamoDbFixture()
-    {
-        _dockerClient = new DockerClientConfiguration().CreateClient();
-    }
-    
     public async Task InitializeAsync()
     {
         const string imageName = "amazon/dynamodb-local";
         const string imageTag = "2.5.4";
         const string containerName = "tunnelgpt-test-dynamodb-local";
         
-        // Pull the image
+        await PullImageAsync(imageName, imageTag);
+        await StartContainerAsync(imageName, containerName);
+    }
+
+    private async Task PullImageAsync(string imageName, string imageTag)
+    {
         await _dockerClient.Images.CreateImageAsync(
             new ImagesCreateParameters { FromImage = imageName, Tag = imageTag },
             null,
             new Progress<JSONMessage>(m => Console.WriteLine($"{m.Status}"))
         );
-        
-        // Create and start the container
+    }
+
+    private async Task StartContainerAsync(string imageName, string containerName)
+    {
         Task<CreateContainerResponse>? response =
             _dockerClient.Containers.CreateContainerAsync(new CreateContainerParameters
             {
@@ -44,7 +46,7 @@ public class DynamoDbFixture : IAsyncLifetime
         await _dockerClient.Containers.StartContainerAsync(_containerId, new ContainerStartParameters());
         Console.WriteLine("DynamoDB Local container is started.");
     }
-
+    
     public async Task DisposeAsync()
     {
         if (!string.IsNullOrEmpty(_containerId))
