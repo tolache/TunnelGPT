@@ -3,7 +3,7 @@
 > [!NOTE]  
 > This project is a **work in progress**.
 
-This is a simple Telegram bot designed to bypass OpenAI's country restrictions by invoking OpenAI API through AWS Lambda.
+This is a simple Telegram bot that forwards user requests to OpenAI's models, enabling access in regions where ChatGPT is unavailable.
 
 Distributed under [CC BY-NC](https://www.creativecommons.org/licenses/by-nc/4.0/) license.
 
@@ -32,7 +32,7 @@ The deployment will create the following resources in your AWS account:
 2. Lambda function that runs the main bot logic.
 3. A CloudWatch log group.
 4. API Gateway for invoking the Lambda function with a request from a Telegram webhook.
-5. Web Application Firewall for verifying the incoming requests are sent by the authorized Telegram webhook.
+5. WAF with an ACL for verifying the incoming requests are sent by the authorized Telegram webhook. This is a paid service.
 
 ### Deployer Requirements
 
