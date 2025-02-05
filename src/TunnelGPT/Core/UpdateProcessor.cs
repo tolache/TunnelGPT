@@ -46,7 +46,7 @@ public class UpdateProcessor(
                     e.Message + Environment.NewLine +
                     e.StackTrace;
         }
-        await telegramClient.SendMessage(chatId, reply);
+        await telegramClient.SendMessage(chatId, reply, ParseMode.Markdown);
         logger.LogInformation($"Sent a reply to user '{username}' with id '{userId})'.");
     }
     
