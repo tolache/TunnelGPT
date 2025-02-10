@@ -2,8 +2,6 @@
 
 This is a simple Telegram bot that forwards user requests to OpenAI's models, enabling access in regions where ChatGPT is unavailable.
 
-Distributed under [CC BY-NC](https://www.creativecommons.org/licenses/by-nc/4.0/) license.
-
 ## Test
 
 ### Tester Requirements
@@ -74,7 +72,7 @@ The deployment will create the following resources in your AWS account:
 
 1. Build .NET application.
    ```shell
-   dotnet publish ./src/TunnelGPT --configuration Release --output ./publish --runtime linux-x64 --self-contained false
+   dotnet publish ./TunnelGPT --configuration Release --output ./publish --runtime linux-x64 --self-contained false
    ```
 2. Create a .zip distribution.
    ```shell
@@ -137,7 +135,7 @@ The deployment will create the following resources in your AWS account:
 
 1. Build .NET application.
    ```powershell
-   dotnet publish ./src/TunnelGPT --configuration Release --output ./publish --runtime linux-x64 --self-contained false
+   dotnet publish ./TunnelGPT --configuration Release --output ./publish --runtime linux-x64 --self-contained false
    ```
 2. Create a .zip distribution.
    ```powershell

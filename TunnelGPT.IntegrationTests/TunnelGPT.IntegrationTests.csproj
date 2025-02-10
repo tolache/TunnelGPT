@@ -20,6 +20,6 @@
         <Using Include="Xunit" />
     </ItemGroup>
     <ItemGroup>
-      <ProjectReference Include="..\..\src\TunnelGPT\TunnelGPT.csproj" />
+      <ProjectReference Include="..\TunnelGPT\TunnelGPT.csproj" />
     </ItemGroup>
 </Project>
