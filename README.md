@@ -1,8 +1,5 @@
 # TunnelGPT
 
-> [!NOTE]  
-> This project is a **work in progress**.
-
 This is a simple Telegram bot that forwards user requests to OpenAI's models, enabling access in regions where ChatGPT is unavailable.
 
 Distributed under [CC BY-NC](https://www.creativecommons.org/licenses/by-nc/4.0/) license.
