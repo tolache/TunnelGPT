@@ -5,7 +5,6 @@ using OpenAI.Chat;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Xunit;
 
 namespace TunnelGPT.UnitTests;
 
