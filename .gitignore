@@ -9,13 +9,4 @@
 **/[Oo]bj
 **/[Pp]ublish
 
-# Terraform
-**/.terraform
-**/*.tfstate
-**/*.tfstate.*
-**/crash.log
-**/crash.*.log
-**/*.tfvars
-**/*.tfvars.json
-**/.terraform.tfstate.lock.info
-**/.terraform.lock.hcl
+.env

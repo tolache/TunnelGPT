@@ -7,6 +7,11 @@ public static class EnvironmentUtils
         return GetEnvironmentVariableOrThrow("OPENAI_API_KEY");
     }
     
+    public static string GetTelegramBotSecret()
+    {
+        return GetEnvironmentVariableOrThrow("TELEGRAM_BOT_SECRET");
+    }
+    
     public static string GetTelegramBotToken()
     {
         return GetEnvironmentVariableOrThrow("TELEGRAM_BOT_TOKEN");
