@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
-using Xunit.Sdk;
 
 namespace TunnelGPT.IntegrationTests;
 
