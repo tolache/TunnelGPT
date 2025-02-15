@@ -15,6 +15,11 @@ public class TelegramWebhookValidation(
 
     public async Task Invoke(HttpContext context)
     {
+        if (!HttpMethods.IsPost(context.Request.Method))
+        {
+            await next(context);
+            return;
+        }
         string? secret = context.Request.Headers[TelegramBotSecretHeader].FirstOrDefault();
         if (string.IsNullOrEmpty(secret) || secret != _expectedSecret)
         {
