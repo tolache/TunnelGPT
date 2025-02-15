@@ -1,0 +1,11 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "OPENAI_API_KEY": "Your OpenAI API key (see README.md)",
+  "TELEGRAM_BOT_TOKEN": "Your Telegram bot token (see README.md)",
+  "TELEGRAM_BOT_SECRET": "Your Telegram bot secret (see README.md)"
+}
