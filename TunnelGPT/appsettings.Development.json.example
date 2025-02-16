@@ -5,6 +5,16 @@
       "Microsoft.AspNetCore": "Warning"
     }
   },
+  "Kestrel": {
+    "Endpoints": {
+      "Http": {
+        "Url": "http://localhost:5002"
+      },
+      "Https": {
+        "Url": "https://localhost:5003"
+      }
+    }
+  },
   "OPENAI_API_KEY": "Your OpenAI API key (see README.md)",
   "TELEGRAM_BOT_TOKEN": "Your Telegram bot token (see README.md)",
   "TELEGRAM_BOT_SECRET": "Your Telegram bot secret (see README.md)"
