@@ -2,6 +2,9 @@
 
 This is a simple Telegram bot that forwards user requests to OpenAI's models, enabling access in regions where ChatGPT is unavailable.
 
+This branch deploys as a serverless application on AWS, which requires **a paid component**: AWS WAF with a WebACL.  
+For a **completely free**, hosted alternative, see the [hosted](https://github.com/tolache/TunnelGPT/tree/hosted) branch.
+
 ## Test
 
 ### Tester Requirements
