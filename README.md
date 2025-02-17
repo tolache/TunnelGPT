@@ -147,7 +147,6 @@ Description=TunnelGPT Telegram Bot
 After=network.target
 
 [Service]
-Environment="ASPNETCORE_ENVIRONMENT=Production"
 Type=simple
 User=$application_user
 WorkingDirectory=$application_home
