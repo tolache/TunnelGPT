@@ -8,17 +8,32 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-        builder.Services.AddLogging();
+        WebApplicationBuilder builder = WebApplication.CreateBuilder(new WebApplicationOptions
+        {
+            Args = args,
+            ApplicationName = typeof(Program).Assembly.FullName,
+            ContentRootPath = GetContentRootPath(),
+        });
         AppSettings appSettings = AppSettings.LoadFromConfiguration(builder.Configuration);
         builder.Services.AddSingleton(appSettings);
+        builder.Services.AddLogging();
         WebApplication app = builder.Build();
-        
+        // TODO: configure self-signed certificate
         app.UseHttpsRedirection();
         app.UseMiddleware<TelegramWebhookValidation>();
         app.MapGet("/", () => "TunnelGPT is running!");
         app.MapPost("/", HandlePostRequest);
+        ILogger<Program> logger = app.Services.GetRequiredService<ILogger<Program>>();
+        logger.LogInformation("Starting '{ApplicationName}' in '{ContentRootPath}'", 
+            app.Configuration["ApplicationName"],
+            app.Environment.ContentRootPath);
         app.Run();
+    }
+
+    private static string GetContentRootPath()
+    {
+        return Path.GetDirectoryName(typeof(Program).Assembly.Location) 
+               ?? throw new InvalidOperationException("Could not determine content root path.");
     }
 
     private static async Task<IResult> HandlePostRequest(HttpRequest request, ILogger<Program> logger)

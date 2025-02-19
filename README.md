@@ -24,12 +24,22 @@ It can be run for free on Oracle Cloud (always free tier) and CockroachDB Cloud 
 
 ## Build
 
-### 1. Initialize appsettings.json
+### 1. Initialize appsettings*.json files
 
-#### 1.A. Linux/macOS
+#### Option 1 (Manual)
+
+1. Copy the `appsettings*.json.example` files to `appsettings*.json` files.
+2. Set the `OPENAI_API_KEY`, `TELEGRAM_BOT_TOKEN`, and `TELEGRAM_BOT_SECRET` to actual values either in the `appsettings*.json` files or via environment variables.
+
+#### Option 2 (Automatic)
+
+This option requires the environment variables `OPENAI_API_KEY`, `TELEGRAM_BOT_TOKEN`, and `TELEGRAM_BOT_SECRET` to be set,
+and it will only initialize `apssettings.json` (but not `appsettings.Development.json`).
+
+##### Linux/macOS
 
 ```shell
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
 appsettings_file="./TunnelGPT/appsettings.json"
 if [ ! -f "$appsettings_file" ]; then
@@ -42,7 +52,7 @@ jq --arg openai "$OPENAI_API_KEY" \
     "$appsettings_file" > "${appsettings_file}.tmp" && mv "${appsettings_file}.tmp" "$appsettings_file"
 ```
 
-#### 1.B. Windows
+##### Windows
 
 ```pwsh
 #!/usr/bin/env pwsh
@@ -65,7 +75,13 @@ catch {
 }
 ```
 
-### 2. Build the application
+### 2. Run tests
+
+```shell
+dotnet test
+```
+
+### 3. Build and publish the binaries
 
 ```shell
 dotnet publish ./TunnelGPT -c Release -r linux-x64 --self-contained false -p:ContinuousIntegrationBuild=true -o ./publish
@@ -73,15 +89,23 @@ dotnet publish ./TunnelGPT -c Release -r linux-x64 --self-contained false -p:Con
 
 ## Deploy
 
-### 1. Prepare the target VM
+### 1. Upload the distro to the target VM
 
-### 2. Upload the distro to the target VM
+#### Linux/macOS
 
 ```shell
-scp -i <path_to_ssh_key> -r ./publish <deployer_user>@<target_servername>:/tmp/TunnelGPT
+(cd publish && zip -r TunnelPGT.zip .)
+scp -i <path_to_ssh_key> publish/TunnelPGT.zip <deployer_user>@<target_servername>:/tmp/
 ```
 
-### 3. Install dependency packages on the target VM
+#### Windows
+
+```pwsh
+Compress-Archive -Path ./publish/* -DestinationPath ./publish/TunnelGPT.zip -Force
+scp -i <path_to_ssh_key> publish/TunnelPGT.zip <deployer_user>@<target_servername>:/tmp/
+```
+
+### 2. Install dependency packages on the target VM
 
 > [!WARNING]  
 > This was tested on Ubuntu 24.04.
@@ -113,7 +137,7 @@ else
 fi
 ```
 
-### 4. Set up the application
+### 3. Set up the application
 
 ```shell
 #!/bin/bash
@@ -138,6 +162,7 @@ fi
 # Initialize application home
 sudo unzip /tmp/TunnelGPT.zip -d /opt/tunnelgpt
 sudo chown -R $application_user:$application_user $application_home
+sudo chmod 600 $application_home/appsettings*.json
 rm /tmp/TunnelGPT.zip
 
 # Register service
