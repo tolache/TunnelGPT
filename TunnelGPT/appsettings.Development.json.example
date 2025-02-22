@@ -11,7 +11,11 @@
         "Url": "http://localhost:5000"
       },
       "Https": {
-        "Url": "https://localhost:5001"
+        "Url": "https://localhost:5001",
+        "Certificate": {
+          "Path": "tunnelgpt-cert.pem",
+          "KeyPath": "tunnelgpt-cert.key"
+        }
       }
     }
   },

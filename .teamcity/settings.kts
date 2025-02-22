@@ -8,41 +8,20 @@ import jetbrains.buildServer.configs.kotlin.buildSteps.powerShell
 import jetbrains.buildServer.configs.kotlin.buildSteps.sshExec
 import jetbrains.buildServer.configs.kotlin.buildSteps.sshUpload
 
-/*
-The settings script is an entry point for defining a TeamCity
-project hierarchy. The script should contain a single call to the
-project() function with a Project instance or an init function as
-an argument.
-
-VcsRoots, BuildTypes, Templates, and subprojects can be
-registered inside the project using the vcsRoot(), buildType(),
-template(), and subProject() methods respectively.
-
-To debug settings scripts in command-line, run the
-
-    mvnDebug org.jetbrains.teamcity:teamcity-configs-maven-plugin:generate
-
-command and attach your debugger to the port 8000.
-
-To debug in IntelliJ Idea, open the 'Maven Projects' tool window (View
--> Tool Windows -> Maven Projects), find the generate task node
-(Plugins -> teamcity-configs -> teamcity-configs:generate), the
-'Debug' option is available in the context menu for the task.
-*/
-
 version = "2024.12"
 
 project {
 
-    buildType(Pets_TunnelGPT_Hosted_Build)
-    buildType(Pets_TunnelGPT_Hosted_Deploy)
+    buildType(Build)
+    buildType(Deploy)
 
     params {
-        text("branch_name", "hosted", readOnly = true, allowEmpty = true)
+        text("branch_name", "hosted", readOnly = true, allowEmpty = false)
+        password("target_servername", "credentialsJSON:184ea855-6e00-41af-ba17-ae8170abc550")
     }
 }
 
-object Pets_TunnelGPT_Hosted_Build : BuildType({
+object Build : BuildType({
     id("Build")
     name = "Build"
 
@@ -65,27 +44,8 @@ object Pets_TunnelGPT_Hosted_Build : BuildType({
             platform = PowerShellStep.Platform.x64
             edition = PowerShellStep.Edition.Core
             formatStderrAsError = true
-            scriptMode = script {
-                content = """
-                    #!/usr/bin/env pwsh
-                    ${'$'}ErrorActionPreference = "Stop"
-                    Set-StrictMode -Version Latest
-                    ${'$'}appsettingsFile = "./TunnelGPT/appsettings.json"
-                    try {
-                        if (-not (Test-Path ${'$'}appsettingsFile)) {
-                            Copy-Item ./TunnelGPT/appsettings.json.example ${'$'}appsettingsFile
-                        }
-                        ${'$'}json = Get-Content ${'$'}appsettingsFile -Raw | ConvertFrom-Json
-                        ${'$'}json.OPENAI_API_KEY      = ${'$'}env:OPENAI_API_KEY
-                        ${'$'}json.TELEGRAM_BOT_TOKEN  = ${'$'}env:TELEGRAM_BOT_TOKEN
-                        ${'$'}json.TELEGRAM_BOT_SECRET = ${'$'}env:TELEGRAM_BOT_SECRET
-                        ${'$'}json | ConvertTo-Json -Depth 10 | Set-Content ${'$'}appsettingsFile -Encoding UTF8
-                    }
-                    catch {
-                        Write-Error "Failed to initialize appsettings.json. Reason:`n${'$'}_"
-                        exit 1
-                    }
-                """.trimIndent()
+            scriptMode = file {
+                path = ".teamcity/init-appsettings.ps1"
             }
         }
         dotnetTest {
@@ -109,27 +69,37 @@ object Pets_TunnelGPT_Hosted_Build : BuildType({
                 -p:AssemblyVersion=1.0.0.%build.number%
             """.trimIndent()
         }
+        powerShell {
+            name = "Create certificate"
+            id = "Create_certificate"
+            edition = PowerShellStep.Edition.Core
+            formatStderrAsError = true
+            scriptMode = file {
+                path = ".teamcity/create-cert.ps1"
+            }
+            args = """-Servername "%target_servername%""""
+        }
     }
 })
 
-object Pets_TunnelGPT_Hosted_Deploy : BuildType({
+object Deploy : BuildType({
+    val targetUploadDir = "/tmp/tunnelgpt"
+
     id("Deploy")
     name = "Deploy"
 
     enablePersonalBuilds = false
-    type = BuildTypeSettings.Type.DEPLOYMENT
-    buildNumberPattern = "${Pets_TunnelGPT_Hosted_Build.depParamRefs.buildNumber}"
+    type = Type.DEPLOYMENT
+    buildNumberPattern = "${Build.depParamRefs.buildNumber}"
     maxRunningBuilds = 1
 
     params {
-        password("target_servername", "credentialsJSON:184ea855-6e00-41af-ba17-ae8170abc550")
         password("target_server_username", "credentialsJSON:baedf541-d196-49d5-bedc-416899708018")
     }
 
     vcs {
-        root(DslContext.settingsRoot)
+        root(DslContext.settingsRoot, "+:.teamcity")
 
-        checkoutMode = CheckoutMode.MANUAL
         cleanCheckout = true
         showDependenciesChanges = true
     }
@@ -138,124 +108,70 @@ object Pets_TunnelGPT_Hosted_Deploy : BuildType({
         sshExec {
             name = "Clear upload destination"
             id = "Clear_upload_destination"
-            commands = """
-                #!/bin/bash
-                set -euo pipefail
-                
-                if ls /tmp/TunnelGPT_build*.zip &>/dev/null; then
-                  rm /tmp/TunnelGPT_build*.zip
-                fi
-            """.trimIndent()
             targetUrl = "%target_servername%"
             authMethod = uploadedKey {
                 username = "%target_server_username%"
                 key = "oracle-cloud-instance-20250205-2240.key"
             }
+            commands = """
+                #!/bin/bash
+                set -euo pipefail
+                
+                if [ -d $targetUploadDir ]; then
+                    rm -rf $targetUploadDir
+                fi
+            """.trimIndent()
         }
         sshUpload {
             name = "Upload"
             id = "Upload"
             transportProtocol = SSHUpload.TransportProtocol.SCP
-            sourcePath = "TunnelGPT_build*.zip"
-            targetUrl = "%target_servername%:/tmp"
+            targetUrl = "%target_servername%:$targetUploadDir"
             timeout = 600
             authMethod = uploadedKey {
                 username = "%target_server_username%"
                 key = "oracle-cloud-instance-20250205-2240.key"
             }
+            sourcePath = """
+                TunnelGPT_build*.zip
+                .teamcity/install-dependencies.sh
+            """.trimIndent()
         }
         sshExec {
             name = "Install dependency packages"
             id = "ssh_exec_runner"
-            commands = """
-                #!/bin/bash
-                set -euo pipefail
-                
-                export DEBIAN_FRONTEND=noninteractive
-                
-                # Install zip
-                if which zip &>/dev/null; then
-                  echo "zip is already installed";
-                else
-                  sudo apt-get update
-                  sudo apt-get -y install zip
-                fi
-                
-                # Install ASP.NET Core runtime
-                dotnet_runtime_package="aspnetcore-runtime-9.0"
-                if dpkg -s ${'$'}dotnet_runtime_package &>/dev/null; then
-                    echo "${'$'}dotnet_runtime_package is already installed."
-                else
-                  sudo apt-get update
-                  sudo apt-get install -y software-properties-common
-                  sudo add-apt-repository -y ppa:dotnet/backports
-                  sudo apt-get install -y ${'$'}dotnet_runtime_package
-                fi
-            """.trimIndent()
             targetUrl = "%target_servername%"
             authMethod = uploadedKey {
                 username = "%target_server_username%"
                 key = "oracle-cloud-instance-20250205-2240.key"
             }
+            commands = """
+                sudo chmod +x .teamcity/install-dependencies.sh
+                sudo .teamcity/install-dependencies.sh
+            """.trimIndent()
         }
         sshExec {
             name = "Set up application"
             id = "Set_up_application"
-            commands = """
-                #!/bin/bash
-                set -euo pipefail
-                
-                application_user="tunnelgpt"
-                application_home="/opt/tunnelgpt"
-                
-                # Uninstall application
-                if systemctl list-unit-files | grep '^tunnelgpt.service' &>/dev/null; then
-                  sudo systemctl stop tunnelgpt
-                fi
-                if [ -d ${'$'}application_home ]; then
-                  sudo rm -rf ${'$'}application_home
-                fi
-                
-                # Initialize user
-                if ! id "${'$'}application_user" &>/dev/null; then
-                  sudo useradd -m -s /bin/bash "${'$'}application_user"
-                fi
-                
-                # Initialize application home
-                build_number="${Pets_TunnelGPT_Hosted_Build.depParamRefs.buildNumber}"
-                sudo unzip /tmp/TunnelGPT_build${'$'}{build_number}.zip -d /opt/tunnelgpt
-                sudo chown -R ${'$'}application_user:${'$'}application_user ${'$'}application_home
-                sudo chmod 600 ${'$'}application_home/appsettings*.json
-                rm /tmp/TunnelGPT_build${'$'}{build_number}.zip
-                
-                # Register service
-                sudo tee /etc/systemd/system/tunnelgpt.service > /dev/null <<EOF
-                [Unit]
-                Description=TunnelGPT Telegram Bot
-                After=network.target
-                
-                [Service]
-                Type=simple
-                User=${'$'}application_user
-                WorkingDirectory=${'$'}application_home
-                ExecStart=/usr/bin/dotnet ${'$'}application_home/TunnelGPT.dll
-                Restart=always
-                RestartSec=30
-                
-                [Install]
-                WantedBy=multi-user.target
-                EOF
-                
-                # Start service
-                sudo systemctl daemon-reload
-                sudo systemctl enable tunnelgpt
-                sudo systemctl start tunnelgpt
-            """.trimIndent()
             targetUrl = "%target_servername%"
             authMethod = uploadedKey {
                 username = "%target_server_username%"
                 key = "oracle-cloud-instance-20250205-2240.key"
             }
+            commands = """
+                sudo chmod +x .teamcity/install-tunnelgpt.sh
+                sudo .teamcity/install-tunnelgpt.sh "$targetUploadDir" "${Build.depParamRefs.buildNumber}"
+            """.trimIndent()
+        }
+        sshExec {
+            name = "Clear temp files"
+            id = "Clear_temp_files"
+            targetUrl = "%target_servername%"
+            authMethod = uploadedKey {
+                username = "%target_server_username%"
+                key = "oracle-cloud-instance-20250205-2240.key"
+            }
+            commands = "rm -rf $targetUploadDir"
         }
     }
 
@@ -270,11 +186,10 @@ object Pets_TunnelGPT_Hosted_Deploy : BuildType({
     }
 
     dependencies {
-        dependency(Pets_TunnelGPT_Hosted_Build) {
+        dependency(Build) {
             snapshot {
                 runOnSameAgent = true
             }
-
             artifacts {
                 artifactRules = "TunnelGPT_build*.zip"
             }

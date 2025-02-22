@@ -87,6 +87,24 @@ dotnet test
 dotnet publish ./TunnelGPT -c Release -r linux-x64 --self-contained false -p:ContinuousIntegrationBuild=true -o ./publish
 ```
 
+### 4. Create/copy certificate files
+
+A TLS certificate is required for the server to listen on HTTPS.
+The `appsettings.json` configuration expects PEM-formatted files named `tunnelgpt-cert.pem` and `tunnelgpt-cert.key`.
+Place them in the `publish` directory after renaming.
+
+To generate a self-signed certificate:
+
+```shell
+country="my-country"
+organization="my-organization"
+servername="my-servername"
+openssl req -x509 -newkey rsa:4096 -sha256 -nodes -days 36500 \
+  -keyout ./publish/tunnelgpt-cert.key \
+  -out ./publish/tunnelgpt-cert.pem \
+  -subj "/C=$country=/O=$organization/CN=$servername"
+```
+
 ## Deploy
 
 ### 1. Upload the distro to the target VM
