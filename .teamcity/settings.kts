@@ -146,8 +146,8 @@ object Deploy : BuildType({
                 key = "oracle-cloud-instance-20250205-2240.key"
             }
             commands = """
-                sudo chmod +x .teamcity/install-dependencies.sh
-                sudo .teamcity/install-dependencies.sh
+                sudo chmod +x $targetUploadDir/install-dependencies.sh
+                sudo $targetUploadDir/install-dependencies.sh
             """.trimIndent()
         }
         sshExec {
@@ -159,8 +159,8 @@ object Deploy : BuildType({
                 key = "oracle-cloud-instance-20250205-2240.key"
             }
             commands = """
-                sudo chmod +x .teamcity/install-tunnelgpt.sh
-                sudo .teamcity/install-tunnelgpt.sh "$targetUploadDir" "${Build.depParamRefs.buildNumber}"
+                sudo chmod +x $targetUploadDir/install-tunnelgpt.sh
+                sudo $targetUploadDir/install-tunnelgpt.sh "$targetUploadDir" "${Build.depParamRefs.buildNumber}"
             """.trimIndent()
         }
         sshExec {
