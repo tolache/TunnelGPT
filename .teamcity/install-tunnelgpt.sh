@@ -27,7 +27,7 @@ fi
 # Initialize application home
 unzip "$upload_dir/TunnelGPT_build$build_number.zip" -d $application_home
 chown -R $application_user:$application_user $application_home
-chmod 600 $application_home/appsettings*.json tunnelgpt-cert.*
+chmod 600 $application_home/appsettings*.json $application_home/tunnelgpt-cert.*
 
 # Register service
 tee /etc/systemd/system/tunnelgpt.service > /dev/null <<EOF
