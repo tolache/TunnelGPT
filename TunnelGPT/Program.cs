@@ -20,12 +20,8 @@ public class Program
         WebApplication app = builder.Build();
         app.UseHttpsRedirection();
         app.UseMiddleware<TelegramWebhookValidation>();
-        app.MapGet("/", () => "TunnelGPT is running!");
+        app.MapGet("/", GenerateHomeMessage);
         app.MapPost("/", HandlePostRequest);
-        ILogger<Program> logger = app.Services.GetRequiredService<ILogger<Program>>();
-        logger.LogInformation("Starting '{ApplicationName}' in '{ContentRootPath}'", 
-            app.Configuration["ApplicationName"],
-            app.Environment.ContentRootPath);
         app.Run();
     }
 
@@ -33,6 +29,12 @@ public class Program
     {
         return Path.GetDirectoryName(typeof(Program).Assembly.Location) 
                ?? throw new InvalidOperationException("Could not determine content root path.");
+    }
+
+    private static string GenerateHomeMessage()
+    {
+        string version = typeof(Program).Assembly.GetName().Version?.ToString() ?? "unknown version";
+        return $"TunnelGPT {version} is running!";
     }
 
     private static async Task<IResult> HandlePostRequest(HttpRequest request, ILogger<Program> logger)
