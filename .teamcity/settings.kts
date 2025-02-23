@@ -189,6 +189,7 @@ object Deploy : BuildType({
         dependency(Build) {
             snapshot {
                 runOnSameAgent = true
+                onDependencyFailure = FailureAction.FAIL_TO_START
             }
             artifacts {
                 artifactRules = "TunnelGPT_build*.zip"
