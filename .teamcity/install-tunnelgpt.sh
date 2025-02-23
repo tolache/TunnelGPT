@@ -29,6 +29,9 @@ unzip "$upload_dir/TunnelGPT_build$build_number.zip" -d $application_home
 chown -R $application_user:$application_user $application_home
 chmod 600 $application_home/appsettings*.json $application_home/tunnelgpt-cert.*
 
+# Allow dotnet to bind to well-known ports (required if environment is Production and application user is non-root)
+setcap CAP_NET_BIND_SERVICE=+eip "$(readlink -f /usr/bin/dotnet)"
+
 # Register service
 tee /etc/systemd/system/tunnelgpt.service > /dev/null <<EOF
 [Unit]
