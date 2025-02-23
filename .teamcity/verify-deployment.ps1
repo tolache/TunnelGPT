@@ -21,5 +21,5 @@ if ($responseStatusCode -ne 200) {
     Write-Error "Failed to verify deployemnt. Deployemnt status '$responseStatusCode' differrs from 200"
     exit 1
 } else {
-    Write-Ouput "Deployment verified successfully. 'https://$Servername/' returned status code 200."
+    Write-Output "Deployment verified successfully. 'https://$Servername/' returned status code 200."
 }
