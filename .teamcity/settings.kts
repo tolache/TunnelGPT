@@ -135,6 +135,7 @@ object Deploy : BuildType({
             sourcePath = """
                 TunnelGPT_build*.zip
                 .teamcity/install-dependencies.sh
+                .teamcity/install-tunnelgpt.sh
             """.trimIndent()
         }
         sshExec {
