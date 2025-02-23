@@ -13,8 +13,8 @@
       "Https": {
         "Url": "https://*:5001",
         "Certificate": {
-          "Path": "tunnelgpt-cert.pem",
-          "KeyPath": "tunnelgpt-cert.key"
+          "Path": "",
+          "KeyPath": ""
         }
       }
     }
