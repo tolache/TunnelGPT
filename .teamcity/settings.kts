@@ -80,6 +80,16 @@ object Build : BuildType({
             scriptArgs = "-Servername %target_servername%"
         }
     }
+
+    features {
+        commitStatusPublisher {
+            vcsRootExtId = "${DslContext.settingsRoot.id}"
+            publisher = github {
+                githubUrl = "https://api.github.com"
+                authType = vcsRoot()
+            }
+        }
+    }
 })
 
 object Deploy : BuildType({

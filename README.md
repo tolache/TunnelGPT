@@ -48,7 +48,7 @@ A TLS certificate is required for the server to listen on HTTPS.
 The `appsettings.json` configuration expects PEM-formatted files named `tunnelgpt-cert.pem` and `tunnelgpt-cert.key`.
 Place them in the `publish` directory after renaming.
 
-To generate a self-signed certificate:
+A 100-year self-signed certificate example:
 
 ```shell
 country="my-country"
