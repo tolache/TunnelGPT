@@ -18,7 +18,7 @@ public class Program
         builder.Services.AddSingleton(appSettings);
         builder.Services.AddLogging();
         WebApplication app = builder.Build();
-        // app.UseHttpsRedirection();
+        app.UseHttpsRedirection();
         app.UseMiddleware<TelegramWebhookValidation>();
         app.MapGet("/", () => "TunnelGPT is running!");
         app.MapPost("/", HandlePostRequest);
