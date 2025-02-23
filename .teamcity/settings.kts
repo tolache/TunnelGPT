@@ -51,8 +51,9 @@ object Build : BuildType({
         dotnetTest {
             name = "Test"
             id = "Test"
+            args = "-p:ContinuousIntegrationBuild=true"
             coverage = dotcover {
-                args = "-p:ContinuousIntegrationBuild=true"
+                assemblyFilters = "-:*Tests"
             }
         }
         dotnetBuild {
