@@ -75,8 +75,9 @@ object Build : BuildType({
             edition = PowerShellStep.Edition.Core
             formatStderrAsError = true
             scriptMode = file {
-                path = ".teamcity/create-cert.ps1 -Servername %target_servername%"
+                path = ".teamcity/create-cert.ps1"
             }
+            scriptArgs = "-Servername %target_servername%"
         }
     }
 })
