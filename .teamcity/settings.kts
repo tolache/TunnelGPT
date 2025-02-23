@@ -79,16 +79,6 @@ object Build : BuildType({
             }
             scriptArgs = "-Servername %target_servername%"
         }
-        powerShell {
-            name = "Verify deployment"
-            id = "Verify_deployment"
-            edition = PowerShellStep.Edition.Core
-            formatStderrAsError = true
-            scriptMode = file {
-                path = ".teamcity/verify-deployment.ps1"
-            }
-            scriptArgs = "-Servername %target_servername%"
-        }
     }
 
     features {
@@ -193,6 +183,16 @@ object Deploy : BuildType({
                 key = "oracle-cloud-instance-20250205-2240.key"
             }
             commands = "rm -rf $targetUploadDir"
+        }
+        powerShell {
+            name = "Verify deployment"
+            id = "Verify_deployment"
+            edition = PowerShellStep.Edition.Core
+            formatStderrAsError = true
+            scriptMode = file {
+                path = ".teamcity/verify-deployment.ps1"
+            }
+            scriptArgs = "-Servername %target_servername%"
         }
     }
 
