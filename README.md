@@ -62,50 +62,26 @@ openssl req -x509 -newkey rsa:4096 -sha256 -nodes -days 36500 \
 
 ## Deploy
 
-### 1. Upload the distro to the target VM
-
-#### Linux/macOS
-
-```shell
-(cd publish && zip -r TunnelPGT.zip .)
-scp -i <path_to_ssh_key> publish/TunnelPGT.zip <deployer_user>@<target_servername>:/tmp/tunnelgpt
-```
-
-#### Windows
-
-```pwsh
-Compress-Archive -Path ./publish/* -DestinationPath ./publish/TunnelGPT.zip -Force
-scp -i <path_to_ssh_key> publish/TunnelPGT.zip <deployer_user>@<target_servername>:/tmp/tunnelgpt
-```
-
-### 2. Install dependency packages on the target VM
-
-Ensure these packages are installed on the deployment target machine:
-- ASP.NET Core Runtime 9.0. See [Install .NET on Linux](https://learn.microsoft.com/en-us/dotnet/core/install/linux).
-- Zip.
-
-### 3. Set up the application
-
-```shell
-#!/bin/bash
-set -euo pipefail
-
-application_user="tunnelgpt"
-
-# Initialize user
-if ! id "$application_user" &>/dev/null; then
-    useradd -m -s /bin/bash "$application_user"
-fi
-
-# Initialize application home
-unzip /tmp/tunnelgpt/TunnelGPT.zip -d /opt/tunnelgpt
-chown -R $application_user:$application_user /opt/tunnelgpt
-chmod 600 /opt/tunnelgpt/appsettings*.json /opt/tunnelgpt/tunnelgpt-cert.*
-rm /tmp/tunnelgpt/TunnelGPT.zip
-
-# Allow dotnet to bind to well-known ports (required if environment is Production and application user is non-root)
-setcap CAP_NET_BIND_SERVICE=+eip $(readlink -f /usr/bin/dotnet)
-
-# Start the application
-dotnet /opt/tunnelgpt/TunnelGPT.dll
-```
+1. Upload the content of the `publish` directory to the target VM.
+2. If you run the application as a non-root user on ports below 1024, ensure that `dotnet` binary has permission to bind to those ports:
+    ```
+    sudo setcap CAP_NET_BIND_SERVICE=+eip $(readlink -f /usr/bin/dotnet)
+    ```
+3. Ensure the firewall allows incoming connections to the application ports (`iptables` example for 80 and 443):
+    ```shell
+    for port in 80 443; do
+      if iptables -C INPUT -m state --state NEW -p tcp --dport $port -j ACCEPT 2>/dev/null; then
+        echo "A rule allowing port $port already exists. No changes made.";
+      else
+        echo "No rule found for port $port. Adding rule...";
+        iptables -I INPUT 6 -m state --state NEW -p tcp --dport $port -j ACCEPT
+        netfilter-persistent save
+      fi
+    done
+    ```
+4. Ensure ASP.NET Core Runtime 9.0 is installed. See [Install .NET on Linux](https://learn.microsoft.com/en-us/dotnet/core/install/linux).
+5. Start the application:
+    ```
+    dotnet <application_home_dir>/TunnelGPT.dll
+    ```
+    For production deployment, you may want to register a service in `systemd`.
