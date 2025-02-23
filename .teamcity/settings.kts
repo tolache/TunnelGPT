@@ -79,6 +79,16 @@ object Build : BuildType({
             }
             scriptArgs = "-Servername %target_servername%"
         }
+        powerShell {
+            name = "Verify deployment"
+            id = "Verify_deployment"
+            edition = PowerShellStep.Edition.Core
+            formatStderrAsError = true
+            scriptMode = file {
+                path = ".teamcity/verify-deployment.ps1"
+            }
+            scriptArgs = "-Servername %target_servername%"
+        }
     }
 
     features {
