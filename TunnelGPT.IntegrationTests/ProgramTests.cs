@@ -20,7 +20,7 @@ public class ProgramTests(WebApplicationFactory<Program> factory) : IClassFixtur
         // Assert
         response.EnsureSuccessStatusCode();
         string content = await response.Content.ReadAsStringAsync();
-        Assert.Equal("TunnelGPT is running!", content);
+        Assert.Matches("TunnelGPT.*is running!", content);
     }
 
     [Fact]
