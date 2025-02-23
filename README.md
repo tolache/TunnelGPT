@@ -15,20 +15,36 @@ It can be run for free on Oracle Cloud (always free tier) and CockroachDB Cloud 
 2. A registered Telegram Bot. [How Do I Create a Bot?](https://core.telegram.org/bots#how-do-i-create-a-bot)
 3. A server to run the bot on, such as an Oracle Cloud (always free tier) instance.
 4. A Database server, such as CockroachDB Cloud (free tier).
-5. .NET 9. 
-6. A valid [OpenAI API token](https://help.openai.com/articles/4936850-where-do-i-find-my-openai-api-key). 
-7. A valid [Telegram bot token](https://core.telegram.org/bots#how-do-i-create-a-bot).
+5. .NET 9.
+
+## Set up dev environment
+
+### 1. Configure application settings
+
+1. Copy the `appsettings*.json.example` files to `appsettings*.json` files.
+2. Set the `OPENAI_API_KEY`, `TELEGRAM_BOT_TOKEN`, and `TELEGRAM_BOT_SECRET` to actual values either in the `appsettings*.json` files or via environment variables:
+   - `OPENAI_API_KEY` - the OpenAI API that will be used by the application.
+   - `TELEGRAM_BOT_TOKEN` - Telegram Bot token received from @BotFather.
+   - `TELEGRAM_BOT_SECRET` - an arbitrary string of up to 256 characters, containing only `A-Z`, `a-z`, `0-9`, `-`, and `_`.
+     This secret verifies that requests to AWS originate from your Telegram webhook.
+
+### 2. Run tests
+
+```shell
+dotnet test
+```
+
+### 3. Launch TunnelGPT from sources
+ 
+```shell
+dotnet run --project ./TunnelGPT
+```
 
 ## Build
 
 ### 1. Initialize appsettings*.json files
 
-1. Copy the `appsettings*.json.example` files to `appsettings*.json` files.
-2. Set the `OPENAI_API_KEY`, `TELEGRAM_BOT_TOKEN`, and `TELEGRAM_BOT_SECRET` to actual values either in the `appsettings*.json` files or via environment variables:
-    - `OPENAI_API_KEY` - the OpenAI API that will be used by the application.
-    - `TELEGRAM_BOT_TOKEN` - Telegram Bot token received from @BotFather.
-    - `TELEGRAM_BOT_SECRET` - an arbitrary string of up to 256 characters, containing only `A-Z`, `a-z`, `0-9`, `-`, and `_`.
-      This secret verifies that requests to AWS originate from your Telegram webhook.
+See the [Configure application settings](#1-configure-application-settings) section.
 
 ### 2. Run tests
 
