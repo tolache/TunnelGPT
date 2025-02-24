@@ -7,9 +7,8 @@ param(
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-$certPemName = "./publish/tunnelgpt-cert.pem"
-$certKeyName = "./publish/tunnelgpt-cert.key"
-
+$certPemName = "tunnelgpt-cert.pem"
+$certKeyName = "tunnelgpt-cert.key"
 
 try {
     openssl req -x509 -newkey rsa:4096 -sha256 -nodes -days 36500 `
