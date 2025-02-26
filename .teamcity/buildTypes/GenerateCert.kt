@@ -4,10 +4,8 @@ import java.io.File
 import jetbrains.buildServer.configs.kotlin.*
 import jetbrains.buildServer.configs.kotlin.buildSteps.PowerShellStep
 import jetbrains.buildServer.configs.kotlin.buildSteps.powerShell
-import org.intellij.lang.annotations.Language
 
-@Language("file-reference")
-val scriptContent = File("../buildScripts/generate-cert.ps1").readText()
+val scriptContent = File("./buildScripts/generate-cert.ps1").readText()
 
 object GenerateCert : BuildType({
     id("GenerateCertificate")

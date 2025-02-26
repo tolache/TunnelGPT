@@ -10,4 +10,5 @@
 **/[Pp]ublish
 **/appsettings*.json
 
+.teamcity/target
 .env
