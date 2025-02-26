@@ -33,7 +33,7 @@ object Build : BuildType({
             edition = PowerShellStep.Edition.Core
             formatStderrAsError = true
             scriptMode = file {
-                path = ".teamcity/init-appsettings.ps1"
+                path = ".teamcity/buildScripts/init-appsettings.ps1"
             }
         }
         dotnetTest {

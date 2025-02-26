@@ -60,8 +60,8 @@ object Deploy : BuildType({
             }
             sourcePath = """
                 TunnelGPT_build*.zip
-                .teamcity/install-dependencies.sh
-                .teamcity/install-tunnelgpt.sh
+                .teamcity/buildScripts/install-dependencies.sh
+                .teamcity/buildScripts/install-tunnelgpt.sh
             """.trimIndent()
         }
         sshExec {
@@ -106,7 +106,7 @@ object Deploy : BuildType({
             edition = PowerShellStep.Edition.Core
             formatStderrAsError = true
             scriptMode = file {
-                path = ".teamcity/verify-deployment.ps1"
+                path = ".teamcity/buildScripts/verify-deployment.ps1"
             }
             scriptArgs = "-Servername %target_servername%"
         }
