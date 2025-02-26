@@ -8,7 +8,7 @@ import jetbrains.buildServer.configs.kotlin.buildSteps.powerShell
 import jetbrains.buildServer.configs.kotlin.buildSteps.sshExec
 import jetbrains.buildServer.configs.kotlin.buildSteps.sshUpload
 
-object Deploy : BuildType({
+class Deploy(private val dependency: BuildBinaries) : BuildType({
     val targetUploadDir = "/tmp/tunnelgpt"
 
     id("Deploy")
@@ -16,7 +16,7 @@ object Deploy : BuildType({
 
     enablePersonalBuilds = false
     type = Type.DEPLOYMENT
-    buildNumberPattern = "${Build.depParamRefs.buildNumber}"
+    buildNumberPattern = "${dependency.depParamRefs.buildNumber}"
     maxRunningBuilds = 1
 
     params {
@@ -87,7 +87,7 @@ object Deploy : BuildType({
             }
             commands = """
                 sudo chmod +x $targetUploadDir/install-tunnelgpt.sh
-                sudo $targetUploadDir/install-tunnelgpt.sh "$targetUploadDir" "${Build.depParamRefs.buildNumber}"
+                sudo $targetUploadDir/install-tunnelgpt.sh "$targetUploadDir" "${dependency.depParamRefs.buildNumber}"
             """.trimIndent()
         }
         sshExec {
@@ -123,7 +123,7 @@ object Deploy : BuildType({
     }
 
     dependencies {
-        dependency(Build) {
+        dependency(dependency) {
             snapshot {
                 onDependencyFailure = FailureAction.FAIL_TO_START
             }

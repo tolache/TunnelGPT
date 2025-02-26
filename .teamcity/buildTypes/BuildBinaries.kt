@@ -7,7 +7,7 @@ import jetbrains.buildServer.configs.kotlin.buildSteps.dotnetBuild
 import jetbrains.buildServer.configs.kotlin.buildSteps.dotnetTest
 import jetbrains.buildServer.configs.kotlin.buildSteps.powerShell
 
-object Build : BuildType({
+class BuildBinaries(private val dependency: GenerateCert) : BuildType({
     id("Build")
     name = "Build"
 
@@ -71,7 +71,7 @@ object Build : BuildType({
     }
 
     dependencies {
-        dependency(GenerateCert) {
+        dependency(dependency) {
             snapshot {
                 onDependencyFailure = FailureAction.FAIL_TO_START
             }

@@ -4,11 +4,14 @@ import jetbrains.buildServer.configs.kotlin.*
 version = "2024.12"
 
 project {
-    buildType(GenerateCert)
-    buildType(Build)
-    buildType(Deploy)
+    val generateCert = GenerateCert()
+    buildType(generateCert)
+    val buildBinaries = BuildBinaries(generateCert)
+    buildType(buildBinaries)
+    val deploy = Deploy(buildBinaries)
+    buildType(deploy)
 
-    buildTypesOrder = arrayListOf(GenerateCert, Build, Deploy)
+    buildTypesOrder = arrayListOf(generateCert, buildBinaries, deploy)
 
     params {
         text("branch_name", "hosted", readOnly = true, allowEmpty = false)
