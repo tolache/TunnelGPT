@@ -2,14 +2,14 @@
 set -euo pipefail
 
 if [ $# -lt 2 ]; then
-  echo "Usage: $0 <upload_dir> <TunnelGPT_build_number>"
+  echo "Usage: $0 <TunnelGPT_build_number>"
   exit 1
 fi
 
 application_user="tunnelgpt"
 application_home="/opt/tunnelgpt"
-upload_dir="$1"
-build_number="$2"
+install_script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+build_number="$1"
 
 # Uninstall application
 if systemctl list-unit-files | grep '^tunnelgpt.service' &>/dev/null; then
@@ -25,7 +25,7 @@ if ! id "$application_user" &>/dev/null; then
 fi
 
 # Initialize application home
-unzip "$upload_dir/TunnelGPT_build$build_number.zip" -d $application_home
+unzip "$install_script_dir/TunnelGPT_build$build_number.zip" -d $application_home
 chown -R $application_user:$application_user $application_home
 chmod 600 $application_home/appsettings*.json $application_home/tunnelgpt-cert.*
 

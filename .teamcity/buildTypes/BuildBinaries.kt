@@ -8,8 +8,11 @@ import jetbrains.buildServer.configs.kotlin.buildSteps.dotnetTest
 import jetbrains.buildServer.configs.kotlin.buildSteps.powerShell
 
 class BuildBinaries(private val dependency: GenerateCert) : BuildType({
-    id("Build")
-    name = "Build"
+    val initAppsettingsScriptCompileTimePath = "buildScripts/init-appsettings.ps1"
+    val appVersion = "1.0.0"
+
+    id("BuildBinaries")
+    name = "Build Binaries"
 
     artifactRules = "publish/** => TunnelGPT_build%build.number%.zip"
 
@@ -29,11 +32,10 @@ class BuildBinaries(private val dependency: GenerateCert) : BuildType({
         powerShell {
             name = "Initialize appsettings.json"
             id = "Initialize_appsettings_json"
-            platform = PowerShellStep.Platform.x64
             edition = PowerShellStep.Edition.Core
             formatStderrAsError = true
             scriptMode = file {
-                path = ".teamcity/buildScripts/init-appsettings.ps1"
+                path = ".teamcity/$initAppsettingsScriptCompileTimePath"
             }
         }
         dotnetTest {
@@ -53,9 +55,9 @@ class BuildBinaries(private val dependency: GenerateCert) : BuildType({
             outputDir = "publish"
             args = """
                 --self-contained false -p:ContinuousIntegrationBuild=true
-                -p:Version=1.0.0
-                -p:FileVersion=1.0.0.%build.number%
-                -p:AssemblyVersion=1.0.0.%build.number%
+                -p:Version=$appVersion
+                -p:FileVersion=$appVersion.%build.number%
+                -p:AssemblyVersion=$appVersion.%build.number%
             """.trimIndent()
         }
     }

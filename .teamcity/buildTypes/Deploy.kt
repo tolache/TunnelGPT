@@ -9,6 +9,11 @@ import jetbrains.buildServer.configs.kotlin.buildSteps.sshExec
 import jetbrains.buildServer.configs.kotlin.buildSteps.sshUpload
 
 class Deploy(private val dependency: BuildBinaries) : BuildType({
+    val depsInstallScriptCompileTimePath = "buildScripts/deploy/install-dependencies.sh"
+    val appInstallScriptCompileTimePath = "buildScripts/deploy/install-tunnelgpt.sh"
+    val verifyDeploymentScriptCompileTimePath = "buildScripts/deploy/verify-deployment.ps1"
+    val depsInstallScriptName = depsInstallScriptCompileTimePath.substringAfterLast("/")
+    val appInstallScriptName = appInstallScriptCompileTimePath.substringAfterLast("/")
     val targetUploadDir = "/tmp/tunnelgpt"
 
     id("Deploy")
@@ -39,14 +44,7 @@ class Deploy(private val dependency: BuildBinaries) : BuildType({
                 username = "%target_server_username%"
                 key = "oracle-cloud-instance-20250205-2240.key"
             }
-            commands = """
-                #!/bin/bash
-                set -euo pipefail
-                
-                if [ -d $targetUploadDir ]; then
-                    rm -rf $targetUploadDir
-                fi
-            """.trimIndent()
+            commands = "if [ -d $targetUploadDir ]; then rm -rf $targetUploadDir; fi"
         }
         sshUpload {
             name = "Upload"
@@ -60,8 +58,8 @@ class Deploy(private val dependency: BuildBinaries) : BuildType({
             }
             sourcePath = """
                 TunnelGPT_build*.zip
-                .teamcity/buildScripts/install-dependencies.sh
-                .teamcity/buildScripts/install-tunnelgpt.sh
+                .teamcity/$depsInstallScriptCompileTimePath
+                .teamcity/$appInstallScriptCompileTimePath
             """.trimIndent()
         }
         sshExec {
@@ -73,8 +71,8 @@ class Deploy(private val dependency: BuildBinaries) : BuildType({
                 key = "oracle-cloud-instance-20250205-2240.key"
             }
             commands = """
-                sudo chmod +x $targetUploadDir/install-dependencies.sh
-                sudo $targetUploadDir/install-dependencies.sh
+                sudo chmod +x $targetUploadDir/$depsInstallScriptName
+                sudo $targetUploadDir/$depsInstallScriptName
             """.trimIndent()
         }
         sshExec {
@@ -86,8 +84,8 @@ class Deploy(private val dependency: BuildBinaries) : BuildType({
                 key = "oracle-cloud-instance-20250205-2240.key"
             }
             commands = """
-                sudo chmod +x $targetUploadDir/install-tunnelgpt.sh
-                sudo $targetUploadDir/install-tunnelgpt.sh "$targetUploadDir" "${dependency.depParamRefs.buildNumber}"
+                sudo chmod +x $targetUploadDir/$appInstallScriptName
+                sudo $targetUploadDir/$appInstallScriptName "${dependency.depParamRefs.buildNumber}"
             """.trimIndent()
         }
         sshExec {
@@ -106,7 +104,7 @@ class Deploy(private val dependency: BuildBinaries) : BuildType({
             edition = PowerShellStep.Edition.Core
             formatStderrAsError = true
             scriptMode = file {
-                path = ".teamcity/buildScripts/verify-deployment.ps1"
+                path = ".teamcity/$verifyDeploymentScriptCompileTimePath"
             }
             scriptArgs = "-Servername %target_servername%"
         }
