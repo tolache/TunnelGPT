@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-if [ $# -lt 2 ]; then
+if [ $# -lt 1 ]; then
   echo "Usage: $0 <TunnelGPT_build_number>"
   exit 1
 fi
