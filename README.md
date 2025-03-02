@@ -3,11 +3,14 @@
 > [!NOTE]  
 > This project is a **work in progress**.
 
-This is the hosted alternative to the [AWS serverless](https://github.com/tolache/TunnelGPT/tree/aws-serverless) version of TunnelGPT,
-a simple Telegram bot that forwards user requests to OpenAI's models,
+This is a simple Telegram bot that forwards user requests to OpenAI's models,
 enabling access in regions where ChatGPT is unavailable.
 
+This branch is for traditional (hosted) deployment.
 It can be run for free on Oracle Cloud (always free tier) and CockroachDB Cloud (free tier).
+
+For a serverless deployment in AWS,
+see the [aws-serverless](https://github.com/tolache/TunnelGPT/tree/aws-serverless) branch.
 
 ## Prerequisites
 
