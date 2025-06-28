@@ -35,7 +35,7 @@ public class ProgramTests(WebApplicationFactory<Program> factory) : IClassFixtur
             RequestUri = new Uri("/", UriKind.Relative),
             Headers =
             {
-                {HttpRequestHeader.ContentType.ToString(), "application/json"},
+                {nameof(HttpRequestHeader.ContentType), "application/json"},
                 {"X-Telegram-Bot-Api-Secret-Token", telegramBotSecret}
             },
             Content = payload,
@@ -60,7 +60,7 @@ public class ProgramTests(WebApplicationFactory<Program> factory) : IClassFixtur
             RequestUri = new Uri("/", UriKind.Relative),
             Headers =
             {
-                {HttpRequestHeader.ContentType.ToString(), "application/json"},
+                {nameof(HttpRequestHeader.ContentType), "application/json"},
             },
             Content = payload,
         };
@@ -83,7 +83,7 @@ public class ProgramTests(WebApplicationFactory<Program> factory) : IClassFixtur
             RequestUri = new Uri("/", UriKind.Relative),
             Headers =
             {
-                {HttpRequestHeader.ContentType.ToString(), "application/json"},
+                {nameof(HttpRequestHeader.ContentType), "application/json"},
                 {"X-Telegram-Bot-Api-Secret-Token", "incorrect_value"},
             },
             Content = payload,
@@ -108,7 +108,7 @@ public class ProgramTests(WebApplicationFactory<Program> factory) : IClassFixtur
             RequestUri = new Uri("/", UriKind.Relative),
             Headers =
             {
-                {HttpRequestHeader.ContentType.ToString(), "application/json"},
+                {nameof(HttpRequestHeader.ContentType), "application/json"},
                 {"X-Telegram-Bot-Api-Secret-Token", telegramBotSecret}
             },
             Content = payload,
