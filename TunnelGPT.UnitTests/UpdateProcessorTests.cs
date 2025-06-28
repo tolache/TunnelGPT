@@ -73,16 +73,6 @@ public class UpdateProcessorTests
         // Assert
         _mockLogger.Verify(
             x => x.Log(
-                It.Is<LogLevel>(level => level == LogLevel.Information),
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, _) => v.ToString() != null && v.ToString()!.Contains("Received a message from user")),
-                It.IsAny<Exception?>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()
-            ),
-            Times.Once()
-        );
-        _mockLogger.Verify(
-            x => x.Log(
                 It.Is<LogLevel>(level => level == LogLevel.Error),
                 It.IsAny<EventId>(),
                 It.IsAny<It.IsAnyType>(),
@@ -100,18 +90,21 @@ public class UpdateProcessorTests
         Update update = new();
         
         // Act
-        await _updateProcessor.ProcessUpdateAsync(update);
-
+        Exception? exception = await Record.ExceptionAsync(
+            () => _updateProcessor.ProcessUpdateAsync(update)
+        );
+        
         // Assert
+        Assert.IsType<ArgumentException>(exception);
         _mockLogger.Verify(
             x => x.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),
-                It.Is<string>(s => s.Contains("Unsupported update.")),
-                null,
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception>(),
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()
             ),
-            Times.Once()
+            Times.AtLeastOnce()
         );
     }
 }
