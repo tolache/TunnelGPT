@@ -1,12 +1,32 @@
+using System.ClientModel;
+using System.ClientModel.Primitives;
+using Microsoft.Extensions.Logging;
+using Moq;
+using OpenAI.Chat;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using TunnelGPT.Core;
+using TunnelGPT.Core.Interfaces;
+using TunnelGPT.Infrastructure.Messaging;
 
 namespace TunnelGPT.UnitTests;
 
 public class UpdateProcessorTests
 {
+    private readonly Mock<ILogger<UpdateProcessor>> _mockLogger = new();
+    private readonly Mock<ChatClient> _mockOpenAiClient = new("gpt-4o", "mock_api_key");
+    private readonly Mock<ITelegramBotClient> _mockTelegramBotClient = new();
+    private readonly UpdateProcessor _updateProcessor;
+
+    public UpdateProcessorTests()
+    {
+        var mockMessageSenderFactory = new Mock<TelegramMessageSenderFactory>(_mockTelegramBotClient.Object);
+        _updateProcessor = new UpdateProcessor(_mockLogger.Object, _mockOpenAiClient.Object, mockMessageSenderFactory.Object);
+    }
+    
     [Fact]
-    public async Task ProcessUpdate_GivenValidUpdate_ReturnsSuccessfulResponse()
+    public async Task ProcessUpdate_GivenValidUpdate_CompletesWithoutError()
     {
         // Arrange
         Update update = new()
@@ -36,11 +56,41 @@ public class UpdateProcessorTests
                 },
             }
         };
+        
+        const string responsePrompt = "response";
+        ChatCompletion? completion = OpenAIChatModelFactory.ChatCompletion(
+            role: ChatMessageRole.User,
+            content: new ChatMessageContent(ChatMessageContentPart.CreateTextPart(responsePrompt)));
+        PipelineResponse pipelineResponse = new Mock<PipelineResponse>().Object;
+        ClientResult<ChatCompletion> completionResult = ClientResult.FromValue(completion, pipelineResponse);
+        _mockOpenAiClient
+            .Setup(x => x.CompleteChatAsync(It.IsAny<ChatMessage[]>()))
+            .ReturnsAsync(completionResult);
 
         // Act
-        throw new NotImplementedException();
+        await _updateProcessor.ProcessUpdateAsync(update);
 
         // Assert
+        _mockLogger.Verify(
+            x => x.Log(
+                It.Is<LogLevel>(level => level == LogLevel.Information),
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, _) => v.ToString() != null && v.ToString()!.Contains("Received a message from user")),
+                It.IsAny<Exception?>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()
+            ),
+            Times.Once()
+        );
+        _mockLogger.Verify(
+            x => x.Log(
+                It.Is<LogLevel>(level => level == LogLevel.Error),
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception?>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()
+            ),
+            Times.Never()
+        );
     }
     
     [Fact]
@@ -50,8 +100,18 @@ public class UpdateProcessorTests
         Update update = new();
         
         // Act
-        throw new NotImplementedException();
+        await _updateProcessor.ProcessUpdateAsync(update);
 
         // Assert
+        _mockLogger.Verify(
+            x => x.Log(
+                LogLevel.Error,
+                It.IsAny<EventId>(),
+                It.Is<string>(s => s.Contains("Unsupported update.")),
+                null,
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()
+            ),
+            Times.Once()
+        );
     }
 }

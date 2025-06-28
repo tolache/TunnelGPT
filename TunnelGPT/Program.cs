@@ -1,5 +1,10 @@
+using OpenAI.Chat;
+using Telegram.Bot;
 using Telegram.Bot.Types;
+using TunnelGPT.Core;
+using TunnelGPT.Core.Interfaces;
 using TunnelGPT.Infrastructure.Configuration;
+using TunnelGPT.Infrastructure.Messaging;
 using TunnelGPT.Infrastructure.Middleware;
 
 namespace TunnelGPT;
@@ -17,6 +22,10 @@ public class Program
         AppSettings appSettings = AppSettings.LoadFromConfiguration(builder.Configuration);
         builder.Services.AddSingleton(appSettings);
         builder.Services.AddLogging();
+        builder.Services.AddSingleton<ITelegramBotClient>(_ => new TelegramBotClient(appSettings.TelegramBotToken));
+        builder.Services.AddSingleton<ChatClient>(_ => new ChatClient("gpt-4o", appSettings.OpenAiApiKey));
+        builder.Services.AddSingleton<TelegramMessageSenderFactory>();
+        builder.Services.AddScoped<UpdateProcessor>();
         WebApplication app = builder.Build();
         app.UseHttpsRedirection();
         app.UseMiddleware<TelegramWebhookValidation>();
@@ -37,7 +46,7 @@ public class Program
         return $"TunnelGPT {version} is running!";
     }
 
-    private static async Task<IResult> HandlePostRequest(HttpRequest request, ILogger<Program> logger)
+    private static async Task<IResult> HandlePostRequest(HttpRequest request, ILogger<Program> logger, UpdateProcessor updateProcessor)
     {
         if (request.ContentLength is null or 0)
         {
@@ -55,11 +64,16 @@ public class Program
         {
             Update? update = await request.ReadFromJsonAsync<Update>();
             if (update is null) return Results.BadRequest("Invalid request. Payload must be an Update object.");
+            await updateProcessor.ProcessUpdateAsync(update);
             return Results.Ok();
         }
         catch (System.Text.Json.JsonException e)
         {
             return Results.BadRequest("Failed to parse payload JSON. Reason: " + e.Message);
+        }
+        catch (ArgumentNullException e)
+        {
+            return Results.BadRequest("Invalid request. Reason: " + e.Message);
         }
     }
 }

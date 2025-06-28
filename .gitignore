@@ -10,5 +10,8 @@
 **/[Pp]ublish
 **/appsettings*.json
 
+# OS
+.DS_Store
+
 .teamcity/target
 .env
