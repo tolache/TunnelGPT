@@ -8,7 +8,6 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using TunnelGPT.Core;
 using TunnelGPT.Core.Interfaces;
-using TunnelGPT.Infrastructure.Messaging;
 
 namespace TunnelGPT.UnitTests;
 
@@ -21,10 +20,10 @@ public class UpdateProcessorTests
 
     public UpdateProcessorTests()
     {
-        var mockMessageSenderFactory = new Mock<TelegramMessageSenderFactory>(_mockTelegramBotClient.Object);
-        _updateProcessor = new UpdateProcessor(_mockLogger.Object, _mockOpenAiClient.Object, mockMessageSenderFactory.Object);
+        var mockMessageSender = new Mock<ITelegramMessageSender>(_mockTelegramBotClient.Object);
+        _updateProcessor = new UpdateProcessor(_mockLogger.Object, _mockOpenAiClient.Object, mockMessageSender.Object);
     }
-    
+
     [Fact]
     public async Task ProcessUpdate_GivenValidUpdate_CompletesWithoutError()
     {
@@ -76,13 +75,13 @@ public class UpdateProcessorTests
                 It.Is<LogLevel>(level => level == LogLevel.Error),
                 It.IsAny<EventId>(),
                 It.IsAny<It.IsAnyType>(),
-                It.IsAny<Exception?>(),
+                It.IsAny<Exception>(),
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()
             ),
             Times.Never()
         );
     }
-    
+
     [Fact]
     public async Task ProcessUpdate_GivenInvalidUpdate_ReturnsErrorResponse()
     {

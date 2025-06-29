@@ -3,14 +3,13 @@ using OpenAI.Chat;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using TunnelGPT.Core.Interfaces;
-using TunnelGPT.Infrastructure.Messaging;
 
 namespace TunnelGPT.Core;
 
 public class UpdateProcessor(
     ILogger<UpdateProcessor> logger,
     ChatClient openAiClient,
-    TelegramMessageSenderFactory messageSenderFactory
+    ITelegramMessageSender telegramMessageSender
 )
 {
     public async Task ProcessUpdateAsync(Update update)
@@ -41,8 +40,7 @@ public class UpdateProcessor(
                     e.Message + Environment.NewLine +
                     e.StackTrace;
         }
-        ITelegramMessageSender telegramMessageSender = messageSenderFactory.Create(chatId);
-        await telegramMessageSender.SendMessageAsync(reply);
+        await telegramMessageSender.SendMessageAsync(chatId, reply);
         logger.LogInformation("Sent a reply to user '{Username}' with id '{UserId})'.", username, userId);
     }
     

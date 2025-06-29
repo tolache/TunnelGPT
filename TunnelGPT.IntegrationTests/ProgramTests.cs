@@ -3,13 +3,45 @@ using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
+using TunnelGPT.Core.Interfaces;
 using TunnelGPT.Infrastructure.Configuration;
+using Moq;
+using OpenAI.Chat;
 
 namespace TunnelGPT.IntegrationTests;
 
-public class ProgramTests(WebApplicationFactory<Program> factory) : IClassFixture<WebApplicationFactory<Program>>
+public class ProgramTests : IClassFixture<WebApplicationFactory<Program>>
 {
-    private readonly HttpClient _client = factory.CreateClient();
+    private readonly HttpClient _client;
+    private readonly string _correctTelegramBotSecret;
+
+    public ProgramTests(WebApplicationFactory<Program> factory)
+    {
+        Mock<ChatClient> mockOpenAiClient = UnitTests.MockFactory.CreateMockOpenAiClient("mock_response");
+        Mock<ITelegramMessageSender> mockTelegramSender = new();
+        mockTelegramSender
+            .Setup(x => x.SendMessageAsync(It.IsAny<ChatId>(), It.IsAny<string>()))
+            .Returns(Task.CompletedTask);
+        _client = factory
+            .WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureServices(services =>
+                {
+                    ServiceDescriptor? chatClient = services
+                        .SingleOrDefault(d => d.ServiceType == typeof(ChatClient)); 
+                    if (chatClient != null) services.Remove(chatClient);
+                    services.AddSingleton(mockOpenAiClient.Object);
+                    
+                    ServiceDescriptor? telegramMessageSender = services
+                        .SingleOrDefault(d => d.ServiceType == typeof(ITelegramMessageSender));
+                    if (telegramMessageSender != null) services.Remove(telegramMessageSender);
+                    services.AddSingleton(mockTelegramSender.Object);
+                });
+            })
+            .CreateClient();
+        _correctTelegramBotSecret = factory.Server.Services.GetRequiredService<AppSettings>().TelegramBotSecret;
+    }
 
     [Fact]
     public async Task GetRoot_ReturnsOk()
@@ -27,8 +59,34 @@ public class ProgramTests(WebApplicationFactory<Program> factory) : IClassFixtur
     public async Task PostWithCorrectSecretAndData_ReturnsOk()
     {
         // Arrange
-        JsonContent payload = JsonContent.Create(new Update());
-        string telegramBotSecret = factory.Server.Services.GetRequiredService<AppSettings>().TelegramBotSecret;
+        Update update = new()
+        {
+            Id = 101,
+            Message = new Message
+            {
+                Id = 201,
+                Date = new DateTime(2025, 1, 1),
+                Text = "Hello, bot!",
+                From = new User
+                {
+                    Id = 301,
+                    FirstName = "John",
+                    LastName = "Doe",
+                    Username = "johndoe",
+                    IsBot = false,
+                    LanguageCode = "en",
+                },
+                Chat = new Chat
+                {
+                    Id = 401,
+                    FirstName = "John",
+                    LastName = "Doe",
+                    Username = "johndoe",
+                    Type = ChatType.Private,
+                },
+            }
+        };
+        JsonContent payload = JsonContent.Create(update);
         HttpRequestMessage request = new()
         {
             Method = HttpMethod.Post,
@@ -36,7 +94,7 @@ public class ProgramTests(WebApplicationFactory<Program> factory) : IClassFixtur
             Headers =
             {
                 {nameof(HttpRequestHeader.ContentType), "application/json"},
-                {"X-Telegram-Bot-Api-Secret-Token", telegramBotSecret}
+                {"X-Telegram-Bot-Api-Secret-Token", _correctTelegramBotSecret}
             },
             Content = payload,
         };
@@ -101,7 +159,6 @@ public class ProgramTests(WebApplicationFactory<Program> factory) : IClassFixtur
     {
         // Arrange
         JsonContent payload = JsonContent.Create("");
-        string telegramBotSecret = factory.Server.Services.GetRequiredService<AppSettings>().TelegramBotSecret;
         HttpRequestMessage request = new()
         {
             Method = HttpMethod.Post,
@@ -109,7 +166,7 @@ public class ProgramTests(WebApplicationFactory<Program> factory) : IClassFixtur
             Headers =
             {
                 {nameof(HttpRequestHeader.ContentType), "application/json"},
-                {"X-Telegram-Bot-Api-Secret-Token", telegramBotSecret}
+                {"X-Telegram-Bot-Api-Secret-Token", _correctTelegramBotSecret}
             },
             Content = payload,
         };
