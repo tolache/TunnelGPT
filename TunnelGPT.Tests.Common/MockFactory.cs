@@ -1,9 +1,9 @@
-using System.ClientModel;
-using System.ClientModel.Primitives;
 using Moq;
 using OpenAI.Chat;
+using System.ClientModel;
+using System.ClientModel.Primitives;
 
-namespace TunnelGPT.UnitTests;
+namespace TunnelGPT.Tests.Common;
 
 public static class MockFactory
 {
