@@ -20,7 +20,7 @@ public class UpdateProcessorTests
 
     public UpdateProcessorTests()
     {
-        var mockMessageSender = new Mock<ITelegramMessageSender>(_mockTelegramBotClient.Object);
+        Mock<ITelegramMessageSender> mockMessageSender = new();
         _updateProcessor = new UpdateProcessor(_mockLogger.Object, _mockOpenAiClient.Object, mockMessageSender.Object);
     }
 

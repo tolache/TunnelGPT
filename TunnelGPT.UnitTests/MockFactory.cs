@@ -5,11 +5,11 @@ using OpenAI.Chat;
 
 namespace TunnelGPT.UnitTests;
 
-public class MockFactory
+public static class MockFactory
 {
-    public static Mock<ChatClient> CreateMockOpenAiClient(string desiredResponse)
+    public static Mock<ChatClient> CreateMockOpenAiClient()
     {
-        string responsePrompt = desiredResponse;
+        string responsePrompt = "mock_response";
         ChatCompletion? completion = OpenAIChatModelFactory.ChatCompletion(
             role: ChatMessageRole.User,
             content: new ChatMessageContent(ChatMessageContentPart.CreateTextPart(responsePrompt))

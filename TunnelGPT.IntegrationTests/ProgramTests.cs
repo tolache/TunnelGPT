@@ -18,7 +18,7 @@ public class ProgramTests : IClassFixture<WebApplicationFactory<Program>>
 
     public ProgramTests(WebApplicationFactory<Program> factory)
     {
-        Mock<ChatClient> mockOpenAiClient = UnitTests.MockFactory.CreateMockOpenAiClient("mock_response");
+        Mock<ChatClient> mockOpenAiClient = UnitTests.MockFactory.CreateMockOpenAiClient();
         Mock<ITelegramMessageSender> mockTelegramSender = new();
         mockTelegramSender
             .Setup(x => x.SendMessageAsync(It.IsAny<ChatId>(), It.IsAny<string>()))
