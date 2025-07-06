@@ -19,3 +19,7 @@
 **/*.tfvars.json
 **/.terraform.tfstate.lock.info
 **/.terraform.lock.hcl
+
+# OS
+.DS_Store
+
