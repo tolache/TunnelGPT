@@ -1,7 +1,7 @@
 import buildTypes.*
 import jetbrains.buildServer.configs.kotlin.*
 
-version = "2024.12"
+version = "2025.03"
 
 project {
     val generateCert = GenerateCert()
