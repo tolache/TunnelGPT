@@ -14,7 +14,7 @@ namespace TunnelGPT.Tests.Unit;
 public class UpdateProcessorTests
 {
     private readonly Mock<ILogger<UpdateProcessor>> _mockLogger = new();
-    private readonly Mock<ChatClient> _mockOpenAiClient = Common.MockFactory.CreateMockOpenAiClient();
+    private readonly Mock<ChatClient> _mockOpenAiClient = Common.OpenAiMockFactory.CreateMockOpenAiClient();
     private readonly Mock<ITelegramBotClient> _mockTelegramBotClient = new();
     private readonly UpdateProcessor _updateProcessor;
 
