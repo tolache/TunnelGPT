@@ -100,7 +100,11 @@ openssl req -x509 -newkey rsa:4096 -sha256 -nodes -days 36500 \
     ```
 4. Ensure ASP.NET Core Runtime 9.0 is installed. See [Install .NET on Linux](https://learn.microsoft.com/en-us/dotnet/core/install/linux).
 5. Start the application:
-    ```
+    ```shell
     dotnet <application_home_dir>/TunnelGPT.dll
     ```
     For production deployment, you may want to register a service in `systemd`.
+6. Set up a Telegram bot webhook (if it is not set up yet).
+   ```shell
+   curl "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/setWebHook?url=$TUNNELGPT_URL&secret_token=$TELEGRAM_BOT_SECRET"
+   ```
