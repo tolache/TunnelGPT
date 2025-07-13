@@ -5,10 +5,10 @@
 .vscode
 
 # .NET
-**/[Bb]in
-**/[Oo]bj
-**/[Pp]ublish
-**/appsettings*.json
+[Bb]in
+[Oo]bj
+[Pp]ublish
+appsettings*.json
 
 # OS
 .DS_Store

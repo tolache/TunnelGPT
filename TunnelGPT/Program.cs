@@ -27,7 +27,6 @@ public class Program
         builder.Services.AddTransient<ITelegramMessageSender, TelegramMessageSender>();
         builder.Services.AddScoped<UpdateProcessor>();
         WebApplication app = builder.Build();
-        app.UseHttpsRedirection();
         app.UseMiddleware<TelegramWebhookValidation>();
         app.MapGet("/", GenerateHomeMessage);
         app.MapPost("/", HandlePostRequest);
