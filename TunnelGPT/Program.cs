@@ -41,8 +41,18 @@ public class Program
 
     private static string GenerateHomeMessage()
     {
-        string version = typeof(Program).Assembly.GetName().Version?.ToString() ?? "unknown version";
-        return $"TunnelGPT {version} is running!";
+        return $"TunnelGPT {GetProductVersion()} is running!";
+    }
+
+    private static string GetProductVersion()
+    {
+        Version? assemblyVersion = typeof(Program).Assembly.GetName().Version;
+        if (assemblyVersion is null)
+        {
+            return "unknown version";
+        }
+
+        return $"{assemblyVersion.Major}.{assemblyVersion.Minor}.{assemblyVersion.Build}";
     }
 
     private static async Task<IResult> HandlePostRequest(HttpRequest request, ILogger<Program> logger, UpdateProcessor updateProcessor)
