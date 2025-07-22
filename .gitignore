@@ -8,10 +8,14 @@
 [Bb]in
 [Oo]bj
 [Pp]ublish
-appsettings*.json
 
 # OS
 .DS_Store
+Thumbs.db
 
+# CI
 .teamcity/target
-.env
+
+# Other
+.env*
+test-payload.json

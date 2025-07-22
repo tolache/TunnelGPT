@@ -23,7 +23,7 @@ public class Program
         builder.Services.AddSingleton(appSettings);
         builder.Services.AddLogging();
         builder.Services.AddSingleton<ITelegramBotClient>(_ => new TelegramBotClient(appSettings.TelegramBotToken));
-        builder.Services.AddSingleton<ChatClient>(_ => new ChatClient("gpt-4o", appSettings.OpenAiApiKey));
+        builder.Services.AddSingleton<ChatClient>(_ => new ChatClient(appSettings.OpenAiModel, appSettings.OpenAiApiKey));
         builder.Services.AddTransient<ITelegramMessageSender, TelegramMessageSender>();
         builder.Services.AddScoped<UpdateProcessor>();
         WebApplication app = builder.Build();
