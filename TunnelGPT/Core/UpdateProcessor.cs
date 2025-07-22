@@ -79,9 +79,9 @@ public class UpdateProcessor(
 
     private async Task<string> GenerateReplyAsync(string messageText)
     {
-        const string systemPrompt = "You are a helpful powered by an OpenAI language model. " +
-                                    "You interact with users through the TunnelGPT Telegram bot. " +
-                                    "You reply in the same language as the user's question unless otherwise specified.";
+        const string systemPrompt =
+            "You are TunnelGPT, a helpful Telegram bot. You relay user messages to an OpenAI LLM and return its replies.";
+
         ClientResult<ChatCompletion>? completionResult = await openAiClient.CompleteChatAsync([
             new SystemChatMessage(systemPrompt), 
             new UserChatMessage(messageText)
@@ -93,7 +93,7 @@ public class UpdateProcessor(
         }
         
         ChatCompletion completion = completionResult.Value;
-        return completion.Content.First()?.Text ?? "Sorry, I couldn't generate a reply. Reason: Received an empty response from AI.";
+        return completion.Content.First()?.Text ?? "Sorry, I couldn't generate a reply. Reason: Received an empty response from LLM.";
     }
     
     private record MessageData(long UserId, string Username, string MessageText, ChatId ChatId);
