@@ -1,3 +1,4 @@
+using System.Reflection;
 using OpenAI.Chat;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -46,13 +47,10 @@ public class Program
 
     private static string GetProductVersion()
     {
-        Version? assemblyVersion = typeof(Program).Assembly.GetName().Version;
-        if (assemblyVersion is null)
-        {
-            return "unknown version";
-        }
-
-        return $"{assemblyVersion.Major}.{assemblyVersion.Minor}.{assemblyVersion.Build}";
+        string version = Assembly.GetAssembly(typeof(Program))?
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+            .InformationalVersion ?? "unknown version";
+        return version;
     }
 
     private static async Task<IResult> HandlePostRequest(HttpRequest request, ILogger<Program> logger, UpdateProcessor updateProcessor)
