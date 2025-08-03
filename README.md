@@ -54,7 +54,7 @@ docker run -d --name tunnelgpt \
   -e OPENAI_API_KEY="$OPENAI_API_KEY" \
   -e TELEGRAM_BOT_TOKEN="$TELEGRAM_BOT_TOKEN" \
   -e TELEGRAM_BOT_SECRET="$TELEGRAM_BOT_SECRET" \
-  tolache/tunnelgpt:latest 
+  tolache/tunnelgpt:latest
  ```
 
 ### 2. Set up a Telegram bot webhook
