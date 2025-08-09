@@ -1,5 +1,4 @@
 using System.Reflection;
-using OpenAI.Chat;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using TunnelGPT.Core;
@@ -7,6 +6,7 @@ using TunnelGPT.Core.Interfaces;
 using TunnelGPT.Infrastructure.Configuration;
 using TunnelGPT.Infrastructure.Messaging;
 using TunnelGPT.Infrastructure.Middleware;
+using TunnelGPT.Infrastructure.OpenAi;
 
 namespace TunnelGPT;
 
@@ -24,7 +24,7 @@ public class Program
         builder.Services.AddSingleton(appSettings);
         builder.Services.AddLogging();
         builder.Services.AddSingleton<ITelegramBotClient>(_ => new TelegramBotClient(appSettings.TelegramBotToken));
-        builder.Services.AddSingleton<ChatClient>(_ => new ChatClient(appSettings.OpenAiModel, appSettings.OpenAiApiKey));
+        builder.Services.AddSingleton<IChatService>(_ => new OpenAiChatService(appSettings));
         builder.Services.AddTransient<ITelegramMessageSender, TelegramMessageSender>();
         builder.Services.AddScoped<UpdateProcessor>();
         WebApplication app = builder.Build();

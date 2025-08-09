@@ -8,6 +8,7 @@
 [Bb]in
 [Oo]bj
 [Pp]ublish
+appsettings.Development.json
 
 # OS
 .DS_Store

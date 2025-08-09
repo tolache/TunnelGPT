@@ -1,5 +1,3 @@
-using System.ClientModel;
-using OpenAI.Chat;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using TunnelGPT.Core.Interfaces;
@@ -8,7 +6,7 @@ namespace TunnelGPT.Core;
 
 public class UpdateProcessor(
     ILogger<UpdateProcessor> logger,
-    ChatClient openAiClient,
+    IChatService chatService,
     ITelegramMessageSender telegramMessageSender
 )
 {
@@ -30,7 +28,7 @@ public class UpdateProcessor(
         string reply;
         try
         {
-            reply = await GenerateReplyAsync(messageText);
+            reply = await GetReplyFromLlm(messageText);
         }
         catch (Exception e)
         {
@@ -41,7 +39,7 @@ public class UpdateProcessor(
                     e.StackTrace;
         }
         await telegramMessageSender.SendMessageAsync(chatId, reply);
-        logger.LogInformation("Sent a reply to user '{Username}' with id '{UserId})'.", username, userId);
+        logger.LogInformation("Sent a reply to user '{Username}' with id '{UserId}'.", username, userId);
     }
     
     private MessageData ExtractMessageData(Update update)
@@ -77,23 +75,27 @@ public class UpdateProcessor(
         return new MessageData(userId, username, messageText, chatId);
     }
 
-    private async Task<string> GenerateReplyAsync(string messageText)
+    private async Task<string> GetReplyFromLlm(string messageText)
     {
-        const string systemPrompt =
-            "You are TunnelGPT, a helpful Telegram bot. You relay user messages to an OpenAI LLM and return its replies.";
+        string systemPrompt = $"You are TunnelGPT, a helpful Telegram bot. " +
+                              $"You relay user messages to the {chatService.Model} LLM and return its replies.";
 
-        ClientResult<ChatCompletion>? completionResult = await openAiClient.CompleteChatAsync([
-            new SystemChatMessage(systemPrompt), 
-            new UserChatMessage(messageText)
-        ]);
-
-        if (completionResult == null)
+        try
         {
-            throw new InvalidOperationException("OpenAI API returned null.");
+            return await chatService.GenerateReplyAsync(systemPrompt, messageText);
         }
-        
-        ChatCompletion completion = completionResult.Value;
-        return completion.Content.First()?.Text ?? "Sorry, I couldn't generate a reply. Reason: Received an empty response from LLM.";
+        catch (Exception e)
+        {
+            logger.LogError("Failed to generate a reply. Reason: {Message}", e.Message);
+            logger.LogDebug("{Stacktrace}", e.StackTrace);
+            string errorReplyMessage = 
+                "Sorry, I couldn't generate a reply. " +
+                "If this error reproduces consistently, please report it to the bot admin. " +
+                "Reason: " + Environment.NewLine + 
+                e.Message + Environment.NewLine + 
+                e.StackTrace;
+            return errorReplyMessage;
+        }
     }
     
     private record MessageData(long UserId, string Username, string MessageText, ChatId ChatId);
