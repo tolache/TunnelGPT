@@ -2,22 +2,25 @@ using Moq;
 using OpenAI.Chat;
 using System.ClientModel;
 using System.ClientModel.Primitives;
+using System.Diagnostics.CodeAnalysis;
 
 namespace TunnelGPT.Tests.Common;
 
-public static class OpenAiMockFactory
+public static class ChatClientMockFactory
 {
-    public static Mock<ChatClient> CreateMockOpenAiClient()
+    [Experimental("OPENAI001")]
+    public static Mock<ChatClient> CreateChatClientMock()
     {
-        ClientResult<ChatCompletion> completionResult = CreateMockChatCompletion();
-        Mock<ChatClient> mockOpenAiClient = new("gpt-4o", "mock_api_key");
-        mockOpenAiClient
+        ClientResult<ChatCompletion> completionResult = CreateChatCompletionMock();
+        Mock<ChatClient> chatClientMock = new("gpt-5.2", "mock_api_key");
+        chatClientMock
             .Setup(x => x.CompleteChatAsync(It.IsAny<ChatMessage[]>()))
             .ReturnsAsync(completionResult);
-        return mockOpenAiClient;
+        return chatClientMock;
     }
 
-    private static ClientResult<ChatCompletion> CreateMockChatCompletion()
+    [Experimental("OPENAI001")]
+    private static ClientResult<ChatCompletion> CreateChatCompletionMock()
     {
         string responsePrompt = "mock_response";
         ChatCompletion? completion = OpenAIChatModelFactory.ChatCompletion(
