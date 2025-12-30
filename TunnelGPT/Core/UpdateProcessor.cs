@@ -78,7 +78,8 @@ public class UpdateProcessor(
     private async Task<string> GetReplyFromLlm(string messageText)
     {
         string systemPrompt = $"You are TunnelGPT, a helpful Telegram bot. " +
-                              $"You relay user messages to the {chatService.Model} LLM and return its replies.";
+                              $"You work by relaying the user messages to the {chatService.Model} LLM." +
+                              "You were created to enable access to the LLM in regions where it is unavailable";
 
         try
         {

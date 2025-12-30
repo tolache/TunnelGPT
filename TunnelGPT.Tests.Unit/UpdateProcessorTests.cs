@@ -1,9 +1,5 @@
-using System.ClientModel;
-using System.ClientModel.Primitives;
 using Microsoft.Extensions.Logging;
 using Moq;
-using OpenAI.Chat;
-using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using TunnelGPT.Core;
@@ -13,15 +9,14 @@ namespace TunnelGPT.Tests.Unit;
 
 public class UpdateProcessorTests
 {
-    private readonly Mock<ILogger<UpdateProcessor>> _mockLogger = new();
-    private readonly Mock<ChatClient> _mockOpenAiClient = Common.OpenAiMockFactory.CreateMockOpenAiClient();
-    private readonly Mock<ITelegramBotClient> _mockTelegramBotClient = new();
+    private readonly Mock<ILogger<UpdateProcessor>> _loggerMock = new();
+    private readonly Mock<IChatService> _chatServiceMock = new();
     private readonly UpdateProcessor _updateProcessor;
 
     public UpdateProcessorTests()
     {
-        Mock<ITelegramMessageSender> mockMessageSender = new();
-        _updateProcessor = new UpdateProcessor(_mockLogger.Object, _mockOpenAiClient.Object, mockMessageSender.Object);
+        Mock<ITelegramMessageSender> messageSenderMock = new();
+        _updateProcessor = new UpdateProcessor(_loggerMock.Object, _chatServiceMock.Object, messageSenderMock.Object);
     }
 
     [Fact]
@@ -55,22 +50,12 @@ public class UpdateProcessorTests
                 },
             }
         };
-        
-        const string responsePrompt = "response";
-        ChatCompletion? completion = OpenAIChatModelFactory.ChatCompletion(
-            role: ChatMessageRole.User,
-            content: new ChatMessageContent(ChatMessageContentPart.CreateTextPart(responsePrompt)));
-        PipelineResponse pipelineResponse = new Mock<PipelineResponse>().Object;
-        ClientResult<ChatCompletion> completionResult = ClientResult.FromValue(completion, pipelineResponse);
-        _mockOpenAiClient
-            .Setup(x => x.CompleteChatAsync(It.IsAny<ChatMessage[]>()))
-            .ReturnsAsync(completionResult);
 
         // Act
         await _updateProcessor.ProcessUpdateAsync(update);
 
         // Assert
-        _mockLogger.Verify(
+        _loggerMock.Verify(
             x => x.Log(
                 It.Is<LogLevel>(level => level == LogLevel.Error),
                 It.IsAny<EventId>(),
@@ -95,7 +80,7 @@ public class UpdateProcessorTests
         
         // Assert
         Assert.IsType<ArgumentException>(exception);
-        _mockLogger.Verify(
+        _loggerMock.Verify(
             x => x.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),

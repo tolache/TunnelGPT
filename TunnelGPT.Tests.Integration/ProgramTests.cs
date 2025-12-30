@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Net;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,11 +17,12 @@ public class ProgramTests : IClassFixture<WebApplicationFactory<Program>>
     private readonly HttpClient _client;
     private readonly string _correctTelegramBotSecret;
 
+    [Experimental("OPENAI001")]
     public ProgramTests(WebApplicationFactory<Program> factory)
     {
-        Mock<ChatClient> mockOpenAiClient = Common.OpenAiMockFactory.CreateMockOpenAiClient();
-        Mock<ITelegramMessageSender> mockTelegramSender = new();
-        mockTelegramSender
+        Mock<ChatClient> openAiClientMock = Common.ChatClientMockFactory.CreateChatClientMock();
+        Mock<ITelegramMessageSender> telegramSenderMock = new();
+        telegramSenderMock
             .Setup(x => x.SendMessageAsync(It.IsAny<ChatId>(), It.IsAny<string>()))
             .Returns(Task.CompletedTask);
         _client = factory
@@ -31,12 +33,12 @@ public class ProgramTests : IClassFixture<WebApplicationFactory<Program>>
                     ServiceDescriptor? chatClient = services
                         .SingleOrDefault(d => d.ServiceType == typeof(ChatClient)); 
                     if (chatClient != null) services.Remove(chatClient);
-                    services.AddSingleton(mockOpenAiClient.Object);
+                    services.AddSingleton(openAiClientMock.Object);
                     
                     ServiceDescriptor? telegramMessageSender = services
                         .SingleOrDefault(d => d.ServiceType == typeof(ITelegramMessageSender));
                     if (telegramMessageSender != null) services.Remove(telegramMessageSender);
-                    services.AddSingleton(mockTelegramSender.Object);
+                    services.AddSingleton(telegramSenderMock.Object);
                 });
             })
             .CreateClient();
