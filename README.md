@@ -40,7 +40,12 @@ dotnet run --project ./TunnelGPT
 
 ```shell
 docker buildx create --name tunnelgpt --use
-docker buildx build --platform linux/amd64,linux/arm64 --tag tolache/tunnelgpt:latest --load .
+docker buildx build . \
+  --build-arg VERSION=2.0.0 \
+  --build-arg REVISION=$(git rev-parse --short HEAD) \
+  --platform linux/amd64,linux/arm64 \
+  --tag tolache/tunnelgpt:latest \
+  --load
 docker buildx rm tunnelgpt
 ```
 
