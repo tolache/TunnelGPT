@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="TunnelGPT.Tests.Common/TunnelGPT.Tests.Common.csproj" />
+  <Project Path="TunnelGPT.Tests.Integration/TunnelGPT.Tests.Integration.csproj" />
+  <Project Path="TunnelGPT.Tests.Unit/TunnelGPT.Tests.Unit.csproj" />
+  <Project Path="TunnelGPT/TunnelGPT.csproj" />
+</Solution>
