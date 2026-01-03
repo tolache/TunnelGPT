@@ -15,7 +15,7 @@ namespace TunnelGPT.Tests.Integration;
 public class ProgramTests : IClassFixture<WebApplicationFactory<Program>>
 {
     private readonly HttpClient _client;
-    private readonly string _correctTelegramBotSecret;
+    private readonly string _correctTelegramWebhookSecret;
 
     [Experimental("OPENAI001")]
     public ProgramTests(WebApplicationFactory<Program> factory)
@@ -42,7 +42,7 @@ public class ProgramTests : IClassFixture<WebApplicationFactory<Program>>
                 });
             })
             .CreateClient();
-        _correctTelegramBotSecret = factory.Server.Services.GetRequiredService<AppSettings>().TelegramBotSecret;
+        _correctTelegramWebhookSecret = factory.Server.Services.GetRequiredService<AppSettings>().TelegramWebhookSecret;
     }
 
     [Fact]
@@ -96,7 +96,7 @@ public class ProgramTests : IClassFixture<WebApplicationFactory<Program>>
             Headers =
             {
                 {nameof(HttpRequestHeader.ContentType), "application/json"},
-                {"X-Telegram-Bot-Api-Secret-Token", _correctTelegramBotSecret}
+                {"X-Telegram-Bot-Api-Secret-Token", _correctTelegramWebhookSecret}
             },
             Content = payload,
         };
@@ -168,7 +168,7 @@ public class ProgramTests : IClassFixture<WebApplicationFactory<Program>>
             Headers =
             {
                 {nameof(HttpRequestHeader.ContentType), "application/json"},
-                {"X-Telegram-Bot-Api-Secret-Token", _correctTelegramBotSecret}
+                {"X-Telegram-Bot-Api-Secret-Token", _correctTelegramWebhookSecret}
             },
             Content = payload,
         };

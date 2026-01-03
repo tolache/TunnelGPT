@@ -1,0 +1,15 @@
+image:
+  repository: "tolache/tunnelgpt"
+  tag: ""                           # Leave empty to use the default ({{ .Chart.AppVersion }})
+secrets:
+  openaiApiKey: ""                  # Specify your API key
+  telegramBotToken: ""              # Specify your bot token
+  telegramWebhookSecret: ""         # Specify your Telegram webhook secret
+domainName: ""                      # Specify your domain name
+resources:
+  requests:
+    cpu: "250m"
+    memory: "128Mi"
+  limits:
+    cpu: "1"
+    memory: "256Mi"

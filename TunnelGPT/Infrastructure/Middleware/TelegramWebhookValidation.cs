@@ -10,8 +10,8 @@ public class TelegramWebhookValidation(
     ILogger<TelegramWebhookValidation> logger
     )
 {
-    private const string TelegramBotSecretHeader = "X-Telegram-Bot-Api-Secret-Token";
-    private readonly string _expectedSecret = appSettings.TelegramBotSecret;
+    private const string TelegramWebhookSecretHeader = "X-Telegram-Bot-Api-Secret-Token";
+    private readonly string _expectedSecret = appSettings.TelegramWebhookSecret;
 
     public async Task Invoke(HttpContext context)
     {
@@ -20,13 +20,13 @@ public class TelegramWebhookValidation(
             await next(context);
             return;
         }
-        string? secret = context.Request.Headers[TelegramBotSecretHeader].FirstOrDefault();
+        string? secret = context.Request.Headers[TelegramWebhookSecretHeader].FirstOrDefault();
         if (string.IsNullOrEmpty(secret) || secret != _expectedSecret)
         {
-            logger.LogWarning("Unauthorized request: Incorrect {HeaderName} header.", TelegramBotSecretHeader);
+            logger.LogWarning("Unauthorized request: Incorrect {HeaderName} header.", TelegramWebhookSecretHeader);
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
             context.Response.ContentType = "application/json";
-            ErrorResponse errorResponse = new("Unauthorized", $"Incorrect {TelegramBotSecretHeader} header.");
+            ErrorResponse errorResponse = new("Unauthorized", $"Incorrect {TelegramWebhookSecretHeader} header.");
             await context.Response.WriteAsync(JsonSerializer.Serialize(errorResponse));
             return;
         }

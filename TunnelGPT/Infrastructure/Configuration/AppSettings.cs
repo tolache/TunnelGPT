@@ -4,7 +4,7 @@ public class AppSettings
 {
     public required string OpenAiApiKey { get; init; }
     public required string OpenAiModel { get; init; }
-    public required string TelegramBotSecret { get; init; }
+    public required string TelegramWebhookSecret { get; init; }
     public required string TelegramBotToken { get; init; }
 
     public static AppSettings LoadFromConfiguration(IConfiguration configuration)
@@ -13,8 +13,8 @@ public class AppSettings
         {
             OpenAiApiKey = GetRequiredSetting(configuration, "OPENAI_API_KEY"),
             OpenAiModel = GetRequiredSetting(configuration, "OPENAI_MODEL"),
-            TelegramBotSecret = GetRequiredSetting(configuration, "TELEGRAM_BOT_SECRET"),
             TelegramBotToken = GetRequiredSetting(configuration, "TELEGRAM_BOT_TOKEN"),
+            TelegramWebhookSecret = GetRequiredSetting(configuration, "TELEGRAM_WEBHOOK_SECRET"),
         };
     }
 
@@ -23,7 +23,9 @@ public class AppSettings
         string? value = configuration[key];
         if (string.IsNullOrEmpty(value))
         {
-            throw new InvalidOperationException($"Environment variable {key} is not set.");
+            throw new InvalidOperationException($"Required configuration setting '{key}' is missing or empty. " +
+                                                "Set it via environment variables or other configuration providers. " +
+                                                "Learn more at https://learn.microsoft.com/en-us/dotnet/core/extensions/configuration-providers");
         }
 
         return value;

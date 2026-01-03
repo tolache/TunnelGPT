@@ -11,6 +11,9 @@
 [Pp]ublish
 appsettings.Development.json
 
+# Helm
+values.secrets.yaml
+
 # OS
 .DS_Store
 Thumbs.db

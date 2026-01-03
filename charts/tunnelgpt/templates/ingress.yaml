@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tunnelgpt
+  labels:
+    {{- include "tunnelgpt.labels" . | nindent 4 }}
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: {{ .Release.Namespace }}-tunnelgpt-strip-prefix@kubernetescrd
+spec:
+  rules:
+    - host: {{ .Values.domainName }}
+      http:
+        paths:
+          - path: /tunnelgpt
+            pathType: Prefix
+            backend:
+              service:
+                name: tunnelgpt
+                port:
+                  number: 80

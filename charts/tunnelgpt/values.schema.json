@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema#",
+  "type": "object",
+  "properties": {
+    "image": {
+      "type": "object",
+      "properties": {
+        "repository": {
+          "type": "string",
+          "description": "Docker image repository",
+          "minLength": 1
+        },
+        "tag": {
+          "type": "string",
+          "description": "Docker image tag"
+        }
+      },
+      "required": [
+        "repository"
+      ]
+    },
+    "secrets": {
+      "type": "object",
+      "properties": {
+        "openaiApiKey": {
+          "type": "string",
+          "minLength": 1,
+          "description": "OpenAI API key. Where to find it: https://help.openai.com/articles/4936850-where-do-i-find-my-openai-api-key"
+        },
+        "telegramBotToken": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Telegram bot token. Provided after creating a bot via Telegram: https://core.telegram.org/bots#how-do-i-create-a-bot"
+        },
+        "telegramWebhookSecret": {
+          "type": "string",
+          "minLength": 16,
+          "maxLength": 256,
+          "description": "Telegram webhook secret, an arbitrary string of alphanumeric characters, dashes, and underscores."
+        }
+      },
+      "required": [
+        "openaiApiKey",
+        "telegramBotToken",
+        "telegramWebhookSecret"
+      ]
+    },
+    "domainName": {
+      "type": "string",
+      "minLength": 3
+    },
+    "resources": {
+      "type": "object",
+      "properties": {
+        "requests": {
+          "type": "object",
+          "properties": {
+            "cpu": {
+              "type": "string",
+              "description": "Min CPU cores"
+            },
+            "memory": {
+              "type": "string",
+              "description": "Min memory"
+            }
+          }
+        },
+        "limits": {
+          "type": "object",
+          "properties": {
+            "cpu": {
+              "type": "string",
+              "description": "Max CPU cores"
+            },
+            "memory": {
+              "type": "string",
+              "description": "Max memory"
+            }
+          }
+        }
+      },
+      "required": [
+      ]
+    }
+  },
+  "required": [
+    "image",
+    "secrets",
+    "domainName"
+  ]
+}
