@@ -1,5 +1,5 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
-ARG VERSION="3.0.0"
+ARG VERSION="3.0.1"
 ARG REVISION="0"
 WORKDIR /src
 COPY TunnelGPT/TunnelGPT.csproj TunnelGPT/

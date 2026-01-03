@@ -40,7 +40,7 @@ dotnet run --project ./TunnelGPT
 
 ```shell
 docker buildx create --name tunnelgpt --use
-VERSION="3.0.0"
+VERSION="3.0.1"
 docker buildx build . \
   --build-arg VERSION=$VERSION \
   --build-arg REVISION=$(git rev-parse --short HEAD) \
@@ -86,7 +86,3 @@ docker buildx rm tunnelgpt
     ```
 
 3. Follow the instructions from the NOTES displayed after the successful execution of the `helm install` command to set up a webhook.
-
-## TODO
-
-Troubleshoot why pod is pending
