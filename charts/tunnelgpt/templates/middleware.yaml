@@ -5,4 +5,4 @@ metadata:
 spec:
   stripPrefix:
     prefixes:
-      - /tunnelgpt
+      - {{ default (printf "/%s" .Release.Namespace) .Values.ingressPath }}

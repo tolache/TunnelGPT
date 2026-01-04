@@ -2,5 +2,5 @@ apiVersion: v2
 name: tunnelgpt
 description: Telegram bot that proxies user requests to OpenAI models
 type: application
-version: 0.1.8
+version: 1.0.1
 appVersion: "3.0.1"

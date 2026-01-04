@@ -1,6 +1,7 @@
 # IDEs
 .idea
 .junie
+.output.txt
 *.DotSettings.user
 .vs
 .vscode

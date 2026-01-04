@@ -12,7 +12,7 @@ spec:
     - host: {{ .Values.domainName }}
       http:
         paths:
-          - path: /tunnelgpt
+          - path: {{ default (printf "/%s" .Release.Namespace) .Values.ingressPath }}
             pathType: Prefix
             backend:
               service:

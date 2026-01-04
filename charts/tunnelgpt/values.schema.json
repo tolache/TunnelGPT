@@ -47,7 +47,12 @@
     },
     "domainName": {
       "type": "string",
-      "minLength": 3
+      "minLength": 3,
+      "description": "Domain name to which the requests from Telegram will be sent."
+    },
+    "ingressPath": {
+      "type": "string",
+      "description": "Path prefix used by the ingress to route the request to the right service in the cluster. Leave empty to use /{{ .Release.Namespace }}"
     },
     "resources": {
       "type": "object",

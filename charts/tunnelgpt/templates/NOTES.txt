@@ -1,2 +1,2 @@
 To add a webhook:
-  curl "https://api.telegram.org/bot{{ .Values.secrets.telegramBotToken }}/setWebHook?url=https://{{ .Values.domainName }}/tunnelgpt&secret_token={{ .Values.secrets.telegramWebhookSecret }}"
+  curl "https://api.telegram.org/bot{{ .Values.secrets.telegramBotToken }}/setWebHook?url=https://{{ .Values.domainName }}/{{ default .Release.Namespace .Values.ingressPath }}&secret_token={{ .Values.secrets.telegramWebhookSecret }}"

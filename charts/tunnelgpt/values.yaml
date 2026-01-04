@@ -6,6 +6,7 @@ secrets:
   telegramBotToken: ""              # Specify your bot token
   telegramWebhookSecret: ""         # Specify your Telegram webhook secret
 domainName: ""                      # Specify your domain name
+ingressPath: ""                     # Leave empty to use /{{ .Release.Namespace }}"
 resources:
   requests:
     cpu: "250m"
